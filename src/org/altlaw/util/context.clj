@@ -50,11 +50,19 @@
   []
   (:env *altlaw-context*))
 
-(defn altlaw-internal-uri
+(defn internal-uri
   "The base URI of the internal.altlaw.org server.  String, includes
   the scheme and host name, but not the initial slash."
   []
   (:internal-uri *altlaw-context*))
+
+(defn internal-db
+  "The DB description for clojure.contrib.sql/with-connection"
+  []
+  {:classname "org.apache.derby.jdbc.EmbeddedDriver"
+   :subprotocol "derby"
+   :subname (str (altlaw-home) "/var/db/" (altlaw-env))
+   :create true})
 
 (defmacro with-altlaw-env
   "Run body with a modified altlaw-env string."
