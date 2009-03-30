@@ -1,0 +1,97 @@
+<project name="altlaw_backend" default="build" basedir=".">
+
+  <property name="dir.src" location="${basedir}/src"/>
+  <property name="dir.build" location="${basedir}/build"/>
+  <property name="dir.classes" location="${dir.build}/classes"/>
+  <property name="dir.clj_classes" location="${dir.build}/clj_classes"/>
+
+  <path id="class.path">
+    <fileset dir="${basedir}/lib">
+      <include name="*.jar"/>
+    </fileset>
+    <pathelement location="${dir.src}"/>
+    <pathelement location="${dir.classes}"/>
+    <pathelement location="${dir.clj_classes}"/>
+  </path>
+
+  <target name="prepare">
+    <mkdir dir="${dir.classes}"/>
+    <mkdir dir="${dir.clj_classes}"/>
+  </target>
+
+  <!-- CLEAN BUILD DIRS -->
+  <target name="clean"
+          description="Delete compiled/generated files.">
+    <delete dir="${dir.build}"/>
+  </target>
+
+  <!-- COMPILE JAVA -->
+  <target name="compile"
+          description="Compile all Java sources."
+          depends="prepare">
+    <javac destdir="${dir.classes}" debug="true">
+      <src path="${dir.src}"/>
+      <exclude name="**/_*.java"/>
+      <classpath refid="class.path"/>
+    </javac>
+  </target>
+
+  <!-- CLOJURE CODE GENERATION UP-TO-DATE? -->
+  <target name="clojure_gen_uptodate">
+    <uptodate targetfile="${dir.clj_classes}/org/altlaw/load_all__init.class"
+              property="clojure_gen.is.uptodate">
+      <srcfiles dir="${dir.src}" includes="**/*.clj"/>
+    </uptodate>
+  </target>
+
+  <!-- CLOJURE CLASS FILE GENERATION -->
+  <target name="compile_clojure"
+          depends="clojure_gen_uptodate,compile"
+          unless="clojure_gen.is.uptodate"
+          description="Generate Clojure static classes.">
+    <delete dir="${dir.clj_classes}"/>
+    <mkdir dir="${dir.clj_classes}"/>
+    <java classname="clojure.lang.Compile">
+      <sysproperty key="clojure.compile.path" value="${dir.clj_classes}"/>
+      <sysproperty key="org.altlaw.home" value="${basedir}"/>
+      <classpath refid="class.path"/>
+      <arg value="org.altlaw.load-all"/>
+    </java>
+  </target>
+
+  <!-- JAR FILE FOR HADOOP -->
+  <target name="job.jar"
+          description="Create JAR for submission as a Hadoop job."
+          depends="compile_clojure">
+    <jar jarfile="${dir.build}/job.jar">
+      <fileset dir="${dir.classes}">
+        <include name="**/*.class"/>
+      </fileset>
+      <fileset dir="${dir.clj_classes}">
+        <include name="**/*.class"/>
+      </fileset>
+      <fileset dir="${dir.src}">
+        <include name="**/*.clj"/>
+        <include name="**/*.st"/>
+        <include name="org/altlaw/solr/conf/*"/>
+      </fileset>
+      <fileset dir=".">
+        <!-- using a location property here doesn't work -->
+        <include name="lib/*.jar"/>
+      </fileset>
+    </jar>
+  </target>
+
+  <!-- DEFAULT TARGET -->
+  <target name="build" depends="job.jar"/>
+
+  <!-- RUN TESTS -->
+  <target name="test" depends="compile_clojure"
+          description="Run all tests">
+    <java classname="org.altlaw.test.run">
+      <sysproperty key="org.altlaw.home" value="${basedir}"/>
+      <classpath refid="class.path"/>
+    </java>
+  </target>
+
+</project>
