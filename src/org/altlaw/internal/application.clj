@@ -3,9 +3,10 @@
               :exposes-methods {start superStart
                                 stop superStop})
   (:import (org.restlet Router))
+  (:use org.altlaw.util.log)
   (:require (org.altlaw.internal.idserver impl CollectionResource KeyResource)
             (org.altlaw.internal.privacy impl DoclistResource)
-            [org.altlaw.constants :as const]))
+            [org.altlaw.util.context :as context]))
 
 (defn shutdown-derby []
   (try (java.sql.DriverManager/getConnection
@@ -16,9 +17,8 @@
 
 (defn -start [this]
   (.superStart this)
-  (.. this getContext getLogger
-      (info (str "Starting internal application with "
-                 const/*altlaw-env* " environment.")))
+  (info "Starting internal application with "
+        (context/altlaw-env) " environment.")
   (org.altlaw.internal.idserver.impl/setup-tables)
   (org.altlaw.internal.privacy.impl/setup-tables)
   (.addShutdownHook (Runtime/getRuntime) (Thread. shutdown-derby)))
