@@ -90,6 +90,7 @@
           description="Run all tests">
     <java classname="org.altlaw.test.run">
       <sysproperty key="org.altlaw.home" value="${basedir}"/>
+      <sysproperty key="org.altlaw.env" value="testing"/>
       <classpath refid="class.path"/>
     </java>
   </target>
