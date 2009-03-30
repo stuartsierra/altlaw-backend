@@ -20,14 +20,14 @@
 (defmulti #^{:private true} extract-context class)
 
 (defmethod extract-context java.util.Properties [props]
-  (extract-content-with #(.getProperty props %)))
+  (extract-context-with #(.getProperty props %)))
 
 (defmethod extract-context org.restlet.Context [context]
   (let [attrs (.getAttributes context)]
-    (extract-content-with #(.get attrs %))))
+    (extract-context-with #(.get attrs %))))
 
 (defmethod extract-context org.apache.hadoop.conf.Configuration [config]
-  (extract-content-with #(.get config %)))
+  (extract-context-with #(.get config %)))
 
 
 ;;; PUBLIC
