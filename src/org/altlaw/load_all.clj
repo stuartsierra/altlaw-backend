@@ -1,5 +1,7 @@
 (ns org.altlaw.load-all
   (:require 
+   org.altlaw.internal.application
+
    org.altlaw.test.run
 
    org.altlaw.util.context
