@@ -37,3 +37,9 @@
 
 (defn www-public-dir []
   (java.io.File. (str (altlaw-home) "/var/public")))
+
+(defn www-static-dir []
+  (java.io.File. (str (altlaw-home) "/src/org/altlaw/www/static")))
+
+(defn solr-home []
+  (java.io.File. (str (altlaw-home) "/var/solr")))
