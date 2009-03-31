@@ -11,6 +11,7 @@
    org.altlaw.util.hadoop
    org.altlaw.util.log
    org.altlaw.util.lucene
+   org.altlaw.util.markdown
    org.altlaw.util.solr
    org.altlaw.util.zip
 ))
