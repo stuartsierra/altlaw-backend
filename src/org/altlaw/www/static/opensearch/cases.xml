@@ -1,0 +1,18 @@
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+  <ShortName>AltLaw: Case Search</ShortName>
+  <LongName>AltLaw.org, the free legal search engine: Case Law Search</LongName>
+  <Description>Search United States Case Law in AltLaw, the free legal search engine</Description>
+  <InputEncoding>UTF-8</InputEncoding>
+  <Image height="16" width="16" type="image/x-icon">http://altlaw.org/favicon.ico</Image>
+  <Image height="64" width="64" type="image/png">http://altlaw.org/images/altlaw-logo-64x64.1.png</Image>
+  <Url type="text/html" method="GET" template="http://altlaw.org/v1/search?q={searchTerms}&amp;page={startPage}&amp;command=search+cases"/>
+  <Url type="application/atom+xml" method="GET" template="http://altlaw.org/v1/search.atom?q={searchTerms}&amp;page={pageOffset}&amp;command=search+cases"/>
+  <Tags>law federal American case cases court courts appeals appellate</Tags>
+  <Query role="example" searchTerms="law" />
+  <Developer>Open-source developer information at http://lawcommons.org/</Developer>
+  <SyndicationRight>open</SyndicationRight>
+  <AdultContent>false</AdultContent>
+  <Language>en-us</Language>
+  <OutputEncoding>UTF-8</OutputEncoding>
+</OpenSearchDescription>
+
