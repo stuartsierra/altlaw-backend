@@ -9,6 +9,7 @@
    org.altlaw.test.internal.privacy.client
    org.altlaw.test.run
    org.altlaw.test.www
+   org.altlaw.test.www.search
 
    org.altlaw.util.context
    org.altlaw.util.date
@@ -22,4 +23,6 @@
 
    org.altlaw.www.render
    org.altlaw.www.content-pages
+   org.altlaw.www.application
+   org.altlaw.www.server
 ))
