@@ -1,0 +1,37 @@
+# US,Sup Ct,supreme,US Sup Ct,Supreme Court,US Supreme Court,United States Supreme Court
+# US App (1st),1st,first,United States Court of Appeals for the First Circuit
+# US App (2nd),2d,2nd,second,United States Court of Appeals for the Second Circuit
+# US App (3rd),3d,3rd,third,United States Court of Appeals for the Third Circuit
+# US App (4th),4th,fourth,United States Court of Appeals for the Fourth Circuit
+# US App (5th),5th,fifth,United States Court of Appeals for the Fifth Circuit
+# US App (6th),6th,sixth,United States Court of Appeals for the Sixth Circuit
+# US App (7th),7th,seventh,United States Court of Appeals for the Seventh Circuit
+# US App (8th),8th,eighth,United States Court of Appeals for the Eighth Circuit
+# US App (9th),9th,ninth,United States Court of Appeals for the Ninth Circuit
+# US App (10th),10th,tenth,United States Court of Appeals for the Tenth Circuit
+# US App (11th),11th,eleventh,United States Court of Appeals for the Eleventh Circuit
+# US App (Fed),Fed.,federal,United States Court of Appeals for the Federal Circuit
+# US App (DC),D.C.,dc,United States Court of Appeals for the District of Columbia Circuit
+# US App (Armed Forces),Armed Forces,af,United States Court of Appeals for the Armed Forces
+
+Appeals, App
+Armed Forces, AF
+Circuit, Cir
+Court, Ct
+District, Dist
+District of Columbia, DC
+Federal, Fed
+Supreme, Sup
+United States, US
+
+First, 1st
+Second, 2nd, 2d
+Third, 3rd, 3d
+Fourth, 4th
+Fifth, 5th
+Sixth, 6th
+Seventh, 7th
+Eighth, 8th
+Ninth, 9th
+Tenth, 10th
+Eleventh, 11th
