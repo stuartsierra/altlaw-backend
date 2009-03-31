@@ -1,7 +1,7 @@
 (ns org.altlaw.test.internal.idserver.client
-  (use org.altlaw.internal.idserver.client
-       clojure.contrib.test-is)
-  (require org.altlaw.test.internal))
+  (:use org.altlaw.internal.idserver.client
+        clojure.contrib.test-is)
+  (:require org.altlaw.test.internal))
 
 (use-fixtures :once 
               org.altlaw.test.internal/internal-server-fixture
