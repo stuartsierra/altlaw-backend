@@ -1,7 +1,7 @@
 (ns org.altlaw.www.SearchResource
-  (:require [org.altlaw.pages.templates :as tmpl]
+  (:require [org.altlaw.www.render :as tmpl]
             [org.altlaw.util.date :as date]
-            [org.altlaw.util :as util]
+            [org.altlaw.util.courts :as courts]
             [org.altlaw.util.context :as context]
             [clojure.contrib.stacktrace :as stacktrace])
   (:use [clojure.contrib.str-utils :only (str-join)])
@@ -78,7 +78,7 @@
    :size (when-let [size (.getFieldValue doc "size")]
            (int (Math/ceil (/ size 1024.0))))
    :date (date/format-long-date (.getFieldValue doc "date"))
-   :court (util/*court-names* (.getFieldValue doc "court"))
+   :court (courts/*court-names* (.getFieldValue doc "court"))
    :name (tmpl/h the-name)
    :citations (map tmpl/h (.getFieldValues doc "citations"))}))
 
