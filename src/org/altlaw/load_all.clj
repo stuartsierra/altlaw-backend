@@ -6,7 +6,7 @@
    org.altlaw.test.internal.idserver.impl
    org.altlaw.test.internal.idserver.client
    org.altlaw.test.internal.privacy.impl
-   ;; org.altlaw.test.internal.privacy.client
+   org.altlaw.test.internal.privacy.client
    org.altlaw.test.run
 
    org.altlaw.util.context
