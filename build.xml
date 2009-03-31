@@ -54,6 +54,7 @@
     <java classname="clojure.lang.Compile">
       <sysproperty key="clojure.compile.path" value="${dir.clj_classes}"/>
       <sysproperty key="org.altlaw.home" value="${basedir}"/>
+      <sysproperty key="org.altlaw.env" value="build"/>
       <classpath refid="class.path"/>
       <arg value="org.altlaw.load-all"/>
     </java>
