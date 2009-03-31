@@ -13,7 +13,7 @@
     (str x)))
 
 (def *template-group*
-     (let [page-templates (StringTemplateGroup. "org.altlaw.templates")]
+     (let [page-templates (StringTemplateGroup. "org.altlaw.www.templates")]
        (when (= (context/altlaw-env) "development")
          ;; By default, templates are never refreshed.
          ;; In development mode, always refresh.
@@ -68,10 +68,10 @@
    render-template."
    [name & attrs]
    (-> *template-group*
-       (.getInstanceOf (str "org/altlaw/templates/" (string name)))
+       (.getInstanceOf (str "org/altlaw/www/templates/" (string name)))
        (render-template (if (map? (first attrs))
-                          (if (rest attrs)
-                            (apply conj (first attrs) (rest attrs))
+                          (if (next attrs)
+                            (apply conj (first attrs) (next attrs))
                             (first attrs))
                           (apply array-map attrs)))))
 
