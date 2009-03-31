@@ -17,4 +17,5 @@
      (.start server#)
      (try ~@body
           (finally (.stop server#)
-                   (.. server# getServers clear)))))
+                   (.. server# getServers clear)
+                   (Thread/sleep 1000)))))
