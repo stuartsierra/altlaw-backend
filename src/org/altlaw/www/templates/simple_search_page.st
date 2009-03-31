@@ -1,0 +1,1 @@
+<p>You didn't search for anything!</p>
