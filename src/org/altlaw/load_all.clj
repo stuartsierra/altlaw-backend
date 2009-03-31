@@ -3,6 +3,7 @@
    org.altlaw.internal.application
 
    org.altlaw.test.internal
+   org.altlaw.test.internal.idserver.impl
    org.altlaw.test.run
 
    org.altlaw.util.context
