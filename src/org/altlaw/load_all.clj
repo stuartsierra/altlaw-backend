@@ -16,4 +16,5 @@
    org.altlaw.util.zip
 
    org.altlaw.www.render
+   org.altlaw.www.content-pages
 ))
