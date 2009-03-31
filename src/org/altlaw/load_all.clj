@@ -8,6 +8,7 @@
    org.altlaw.test.internal.privacy.impl
    org.altlaw.test.internal.privacy.client
    org.altlaw.test.run
+   org.altlaw.test.www
 
    org.altlaw.util.context
    org.altlaw.util.date
