@@ -14,4 +14,6 @@
    org.altlaw.util.markdown
    org.altlaw.util.solr
    org.altlaw.util.zip
+
+   org.altlaw.www.render
 ))
