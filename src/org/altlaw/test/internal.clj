@@ -8,10 +8,19 @@
 (defn internal-server-fixture [f]
   (restlet/with-server
    13669 (new org.altlaw.internal.application)
-   (binding [client/*client-base-uri* "http://localhost:13669"]
-     (f))))
+   (f)))
 
-(use-fixtures :once internal-server-fixture)
+(defn internal-client-uri-fixture [f]
+  (binding [client/*client-base-uri* "http://localhost:13669"]
+    (f)))
+
+(defn internal-uri-fixture [f]
+  (binding [context/internal-uri (fn [] "http://localhost:13669")]
+    (f)))
+
+(use-fixtures :once 
+              internal-server-fixture
+              internal-client-uri-fixture)
 
 
 (deftest can-store-and-retrieve-ids
