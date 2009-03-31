@@ -8,6 +8,7 @@
             org.altlaw.www.CiteFinder
             org.altlaw.www.AllCasesFinder
             org.altlaw.www.SearchResource
+            org.altlaw.www.content-pages
             [org.altlaw.util.context :as context]
             [org.altlaw.util.solr :as solr]))
 
@@ -17,6 +18,9 @@
     (.superStart this)
     (.info logger (str "Starting www application with "
                        (context/altlaw-env) " environment."))
+    ;; Generate static content pages:
+    (org.altlaw.www.content-pages/save-static-pages)
+    ;; Start Solr:
     (let [[server core] (solr/start-embedded-solr (context/solr-home))
           attrs (.getAttributes context)]
       (.put attrs "org.altlaw.solr.server" server)
