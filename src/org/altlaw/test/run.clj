@@ -4,5 +4,9 @@
 
 (defn -main [& args]
   (require 'org.altlaw.load-all)
-  (t/run-all-tests))
+  (if (or (nil? args) (empty? args))
+    (apply t/run-tests 
+           (filter #(.startsWith (str (ns-name %)) "org.altlaw.")
+                   (all-ns)))
+    (apply t/run-tests (map #(find-ns (symbol %)) args))))
 
