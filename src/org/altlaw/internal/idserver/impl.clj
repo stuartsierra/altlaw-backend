@@ -34,7 +34,7 @@ WHERE coll_name = ? AND doc_key = ?"]
     (sql/with-connection
      (context/internal-db) (sql/with-query-results
                             result [stmt map-name]
-                            (when-not (nil? result)
+                            (when-not (or (nil? result) (empty? result))
                               (doall (map (fn [entry] [(:doc_key entry) (:docid entry)])
                                           result)))))))
 
