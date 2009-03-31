@@ -32,3 +32,8 @@
    :subname (java.io.File. (str (altlaw-home) "/var/db/" (altlaw-env)))
    :create true})
 
+(defn www-content-dir []
+  (java.io.File. (str (altlaw-home) "/src/org/altlaw/www/content")))
+
+(defn www-public-dir []
+  (java.io.File. (str (altlaw-home) "/var/public")))
