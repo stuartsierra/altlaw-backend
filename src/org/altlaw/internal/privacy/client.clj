@@ -1,7 +1,6 @@
 (ns org.altlaw.internal.privacy.client
-  (:require [org.altlaw.constants :as const]
+  (:require [org.altlaw.util.context :as context]
             [org.altlaw.util.http-client :as client]
-            [org.altlaw.rest.component :as component]
             [clojure.contrib.duck-streams :as duck])
   (:import (org.restlet.data Status)))
 
