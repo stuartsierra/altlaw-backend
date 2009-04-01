@@ -5,6 +5,8 @@
   <property name="dir.classes" location="${dir.build}/classes"/>
   <property name="dir.clj_classes" location="${dir.build}/clj_classes"/>
   <property name="dir.var" location="${basedir}/var"/>
+  <property name="file.test.out" location="${dir.build}/test.out.log"/>
+  <property name="file.test.err" location="${dir.build}/test.err.log"/>
 
   <path id="class.path">
     <fileset dir="${basedir}/lib">
@@ -92,11 +94,20 @@
   <!-- RUN TESTS -->
   <target name="test" depends="compile_clojure"
           description="Run all tests">
-    <java classname="org.altlaw.test.run">
+    <java classname="org.altlaw.test.run"
+          output="${file.test.out}"
+          error="${file.test.err}">
       <sysproperty key="org.altlaw.home" value="${basedir}"/>
       <sysproperty key="org.altlaw.env" value="testing"/>
       <classpath refid="class.path"/>
     </java>
+    <loadfile srcfile="${file.test.out}" property="test.out.tail">
+      <filterchain>
+        <tailfilter lines="2"/>
+      </filterchain>
+    </loadfile>
+    <echo message="${test.out.tail}"/>
+    <echo message="Detailed test reports are in ${file.test.out} and ${file.test.err}"/>
   </target>
 
 </project>
