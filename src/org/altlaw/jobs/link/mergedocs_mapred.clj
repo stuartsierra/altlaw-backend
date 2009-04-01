@@ -1,0 +1,28 @@
+(ns org.altlaw.jobs.link.mergedocs-mapred
+    (:gen-class
+     :extends org.apache.hadoop.mapred.MapReduceBase
+     :implements [org.apache.hadoop.mapred.Reducer])
+    (:require [org.altlaw.constants :as const]
+              [org.altlaw.internal.privacy.client :as privacy])
+    (:use org.altlaw.util org.altlaw.util.hadoop))
+
+(import-hadoop)
+
+(def *log* (LogFactory/getLog "org.altlaw.link.mergedocs"))
+
+(def *removed-docids* (ref #{}))
+
+(defn -configure [this jobconf]
+  (binding [const/*internal-base-uri* (.get jobconf "org.altlaw.internal.base")]
+    (dosync (ref-set *removed-docids* (privacy/get-removed)))
+    (.info *log* (str "The following docids have been removed: "
+                      (pr-str @*removed-docids*)))))
+
+(defn -reduce [this wdocid idocs output reporter]
+  (if (@*removed-docids* (.get wdocid))
+    (.info *log* (str "Omitting removed docid " (.get wdocid)))
+    (let [docs (doall (map (comp read-string str) (iterator-seq idocs)))
+          doc (merge-fields docs)]
+      ;; (doseq d docs (.debug *log* (str "input: " (pr-str d))))
+      ;; (.debug *log* (str "REDUCE OUTPUT: " (pr-str doc)))
+      (.collect output wdocid (Text. (pr-str doc))))))
