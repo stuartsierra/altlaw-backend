@@ -4,6 +4,7 @@
   <property name="dir.build" location="${basedir}/build"/>
   <property name="dir.classes" location="${dir.build}/classes"/>
   <property name="dir.clj_classes" location="${dir.build}/clj_classes"/>
+  <property name="dir.var" location="${basedir}/var"/>
 
   <path id="class.path">
     <fileset dir="${basedir}/lib">
@@ -23,6 +24,8 @@
   <target name="clean"
           description="Delete compiled/generated files.">
     <delete dir="${dir.build}"/>
+    <delete dir="${dir.var}"/>
+    <delete file="${basedir}/derby.log"/>
   </target>
 
   <!-- COMPILE JAVA -->
