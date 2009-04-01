@@ -3,13 +3,15 @@
      :extends org.apache.hadoop.mapred.MapReduceBase
      :implements [org.apache.hadoop.mapred.Mapper
                   org.apache.hadoop.mapred.Reducer])
-    (:use org.altlaw.util org.altlaw.func.ohm1 org.altlaw.util.hadoop)
+    (:use org.altlaw.extract.ohm1-utils org.altlaw.util.hadoop)
+    (:require [org.altlaw.util.log :as log]
+              [org.altlaw.util.tsv :as tsv]
+              [org.altlaw.util.merge-fields :as merge])
     (:refer clojure.set)
     (:import (java.io InputStreamReader ByteArrayInputStream File)
              (java.util Arrays)
-             (org.altlaw.util RandomWait)
-             (org.altlaw.func Ohm1XMLReader RunProgramOnFile
-                              PROHTMLToText Anonymizer)))
+             (org.altlaw.extract Ohm1XMLReader PROHTMLToText Anonymizer)
+             (org.altlaw.util RunProgramOnFile)))
 
 (import-hadoop)
 
@@ -80,7 +82,7 @@
         path (first (filter #(= (.getName %) "docids.tsv.gz") cached))]
     (when (nil? path) (throw (RuntimeException. "No docid.tsv.gz in DistributedCache.")))
     (.info *log* (str "Loading docid map from " path))
-    (dosync (ref-set *docid-map* (load-tsv-map (str path))))))
+    (dosync (ref-set *docid-map* (tsv/load-tsv-map (str path))))))
 
 (defn -map [this wfilename wbytes output reporter]
   (let [filename (str wfilename)
@@ -94,7 +96,7 @@
                                             filename ": " e))))]
         (when-let [doc (binding [*reporter* reporter]
                          (process type docid filename bytes size))]
-            (.debug *log* (str "OUTPUT: " (logstr doc)))
+            (.debug *log* (str "OUTPUT: " (log/logstr doc)))
           (.collect output (IntWritable. docid) (Text. (pr-str doc))))
         (.incrCounter reporter "procfiles.ohm1" "No docid" 1))))
 
@@ -102,9 +104,9 @@
   (.debug *log* (str "Reduce processing " (.get wdocid)))
   (let [docid (.get wdocid)
         maps (doall (map (comp read-string str) (iterator-seq wfields)))
-        doc (reduce singleize {} (apply merge-with union maps))]
+        doc (reduce merge/singleize {} (apply merge-with union maps))]
     (if (and (:html doc) (:text doc))
-      (do (.debug *log* (str "OUTPUT:" (logstr doc)))
+      (do (.debug *log* (str "OUTPUT:" (log/logstr doc)))
           (.collect output wdocid (Text. (pr-str doc))))
       ;; else
       (do (.warn *log* (str docid ": No html/text; skipping."))

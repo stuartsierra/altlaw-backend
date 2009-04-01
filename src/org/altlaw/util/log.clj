@@ -1,4 +1,6 @@
 (ns org.altlaw.util.log
+  (:require [org.altlaw.util.string :as str]
+            [clojure.contrib.walk :as walk])
   (:import (org.apache.commons.logging Log LogFactory)
            (org.altlaw.util.logging
             JavaLoggingToCommonLoggingRedirector)))
@@ -37,3 +39,14 @@
      (when (. log# isFatalEnabled)
        (. log# (fatal (str ~@args))))))
 
+(defn- truncate-strings
+  "Find all strings in x and truncate them to max characters."
+  [x max]
+  (walk/prewalk (fn [y] (if (string? y) (str/truncate y max) y)) x))
+
+(defn logstr
+  "Print shortened form of arg suitable for logging."
+  [arg]
+  (binding [*print-length* 20
+            *print-level* 10]
+    (pr-str (truncate-strings arg 70))))

@@ -1,7 +1,6 @@
 (ns org.altlaw.jobs.link.mergedocs
     (:use clojure.contrib.trace org.altlaw.util.hadoop)
-    (:require org.altlaw.jobs.link.mergedocs-mapred
-              [org.altlaw.constants :as const])
+    (:require org.altlaw.jobs.link.mergedocs-mapred)
     (:gen-class
      :extends org.apache.hadoop.conf.Configured
      :implements [org.apache.hadoop.util.Tool]))

@@ -1,8 +1,8 @@
 (ns org.altlaw.jobs.procfiles.altcrawl
-  (:require [org.altlaw.util :as util]
-            [org.altlaw.util.hadoop :as hadoop]
+  (:require [org.altlaw.util.hadoop :as hadoop]
             [clojure.contrib.walk :as walk])
-  (:use clojure.contrib.json.read)
+  (:use clojure.contrib.json.read
+        org.altlaw.util.log)
   (:import (org.apache.commons.codec.binary Base64)
            (java.util Arrays)))
 
@@ -61,7 +61,7 @@
 (defn mapper-map [this wkey wvalue output reporter]
     (let [input (walk/keywordize-keys (read-json-string (str wvalue)))]
       (.debug *log* (str "Called map with file position " wkey
-                         " and value " (util/logstr input)))
+                         " and value " (logstr input)))
       (binding [*reporter* reporter]
         (doseq [[key value] (my-map input)]
           (.collect output (Text. key) (Text. value))))))

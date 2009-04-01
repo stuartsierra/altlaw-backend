@@ -3,7 +3,8 @@
      :extends org.apache.hadoop.mapred.MapReduceBase
      :implements [org.apache.hadoop.mapred.Mapper
                   org.apache.hadoop.mapred.Reducer])
-    (:use org.altlaw.util org.altlaw.util.hadoop)
+    (:require [org.altlaw.util.log :as log])
+    (:use org.altlaw.util.hadoop)
     (:refer clojure.set))
 
 (import-hadoop)
@@ -67,17 +68,17 @@
 (defn -map [this wdocid wdoc output reporter]
   (let [docid (.get wdocid)
         doc (read-string (str wdoc))]
-    (.debug *log* (str "Map input " docid "\t" (logstr doc)))
+    (.debug *log* (str "Map input " docid "\t" (log/logstr doc)))
     (binding [*reporter* reporter]
       (doseq [[key value] (concat (map-cite-belongs-to docid doc)
                                   (map-cites-in-text docid doc))]
-        (.debug *log* (str "OUTPUT: " key "\t" (logstr value)))
+        (.debug *log* (str "OUTPUT: " key "\t" (log/logstr value)))
         (.collect output (Text. key) (Text. (pr-str value)))))))
 
 (defn -reduce [this wcite wdocs output reporter]
   (let [cite (str wcite)
         docs (map (comp read-string str) (iterator-seq wdocs))]
-    (.debug *log* (str "Reduce input: " cite "\t" (logstr docs)))
+    (.debug *log* (str "Reduce input: " cite "\t" (log/logstr docs)))
     (binding [*reporter* reporter]
       (doseq [[key value] (reduce-cite-links cite docs)]
         (.debug *log* (str "OUTPUT: " key "\t" value))

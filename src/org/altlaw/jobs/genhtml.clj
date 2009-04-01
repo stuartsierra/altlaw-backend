@@ -1,6 +1,6 @@
 (ns org.altlaw.jobs.genhtml
   (:require [org.altlaw.util.hadoop :as hadoop]
-            [org.altlaw.pages.cases :as cases]))
+            [org.altlaw.www.case-pages :as cases]))
 
 (hadoop/setup-mapreduce)
 

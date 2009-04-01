@@ -1,11 +1,7 @@
 (ns org.altlaw.jobs.distindex
-  (:require [org.altlaw.util.solr :as solr]
-            [org.altlaw.util.hadoop :as hadoop]
-            [org.altlaw.util.zip :as zip]
-            [org.altlaw.util :as util]
-            ;; only needed for testing:
-            [org.altlaw.constants :as const]
-            [clojure.contrib.shell-out :as sh])
+   (:require [org.altlaw.util.solr :as solr]
+             [org.altlaw.util.hadoop :as hadoop]
+             [org.altlaw.util.zip :as zip])
   (:use [clojure.contrib.test-is :only (deftest- is)])
   (:import (org.apache.commons.io FileUtils)
            (java.io File)))

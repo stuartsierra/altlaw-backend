@@ -3,7 +3,7 @@
      :extends org.apache.hadoop.mapred.MapReduceBase
      :implements [org.apache.hadoop.mapred.Mapper
                   org.apache.hadoop.mapred.Reducer])
-    (:use org.altlaw.util org.altlaw.util.hadoop)
+    (:use org.altlaw.util.hadoop)
     (:refer clojure.set))
 
 (import-hadoop)

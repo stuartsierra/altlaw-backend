@@ -1,11 +1,13 @@
 (ns org.altlaw.jobs.procfiles.profed-map
-  (:use clojure.contrib.trace org.altlaw.util org.altlaw.util.hadoop)
-  (:import (org.altlaw.func PROBodyExtractor Anonymizer
-                            PROMetadataReader PROHTMLToText)
-           (java.io StringReader))
   (:gen-class
    :extends org.apache.hadoop.mapred.MapReduceBase
-   :implements [org.apache.hadoop.mapred.Mapper]))
+   :implements [org.apache.hadoop.mapred.Mapper])
+  (:use clojure.contrib.trace org.altlaw.util.hadoop)
+  (:require [org.altlaw.util.tsv :as tsv]
+            [org.altlaw.util.log :as log])
+  (:import (org.altlaw.extract PROBodyExtractor Anonymizer
+                            PROMetadataReader PROHTMLToText)
+           (java.io StringReader)))
 
 (import-hadoop)
 
@@ -43,7 +45,7 @@
         path (first (filter #(= (.getName %) "docids.tsv.gz") cached))]
     (when (nil? path) (throw (RuntimeException. "No docid.tsv.gz in DistributedCache.")))
     (.info *log* (str "Loading docid map from " path))
-    (dosync (ref-set *docid-map* (load-tsv-map (str path))))))
+    (dosync (ref-set *docid-map* (tsv/load-tsv-map (str path))))))
 
 (defn -map [self #^Text key #^BytesWritable value
             #^OutputCollector output reporter]
@@ -51,6 +53,6 @@
         bytes (.get value)]
     (.debug *log* (str "Map input file: " filename))
     (when-let [doc (process filename bytes (.getSize value))]
-      (.debug *log* (str "OUTPUT: " (logstr doc)))
+      (.debug *log* (str "OUTPUT: " (log/logstr doc)))
       (.collect output (IntWritable. (:docid doc))
                 (Text. (pr-str doc))))))

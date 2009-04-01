@@ -27,3 +27,20 @@
   (is (= "12/34/123456" (docid-path 123456)))
   (is (= "12/34/56/1234567" (docid-path 1234567)))
   (is (= "12/34/56/78/123456789" (docid-path 123456789))))
+
+(def #^{:private true} *extension-mime-types*
+  {"txt"   "text/plain"
+   "asc"   "text/plain"
+   "htm"   "text/html"
+   "html"  "text/html"
+   "json"  "application/json"
+   "xml"   "application/xml"
+   "xhtml" "application/xhtml+xml"
+   "pdf"   "application/pdf"
+   "doc"   "application/msword"
+   "wpd"   "application/vnd.wordperfect"})
+
+(defn guess-mime-type-by-name [#^File file]
+  (let [extension (.toLowerCase #^String (last (.split (str file) "\\.")))]
+    (*extension-mime-types* extension)))
+
