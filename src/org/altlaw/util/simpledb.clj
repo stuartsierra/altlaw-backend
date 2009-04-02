@@ -67,3 +67,11 @@
   ([domain-name query-string]
      (.getItemList (.listItems (get-domain domain-name)
                                query-string))))
+
+(defn select-items
+  ([domain-name query-string]
+     (select-items domain-name query-string nil))
+  ([domain-name query-string next-token]
+     (reduce (fn [m [k v]] (assoc m k (parse-attr-list v)))
+             {} (.getItems (.selectItems (get-domain domain-name)
+                                         query-string next-token)))))
