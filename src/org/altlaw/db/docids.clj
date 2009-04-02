@@ -11,7 +11,7 @@
     (if (< (count s) 1024)
       s (subs s 0 1024))))
 
-(def #^{:private true} *number-format* "%09d")
+(def #^{:private true} *number-format* "%010d")
 
 (def #^{:private true} *base-number-string*
      (format *number-format* 10000))
