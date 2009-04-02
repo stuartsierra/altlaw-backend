@@ -75,3 +75,7 @@
      (reduce (fn [m [k v]] (assoc m k (parse-attr-list v)))
              {} (.getItems (.selectItems (get-domain domain-name)
                                          query-string next-token)))))
+
+(defn delete-where [domain-name query-string]
+  (doseq [item (list-items domain-name query-string)]
+    (delete-item domain-name (.getIdentifier item))))
