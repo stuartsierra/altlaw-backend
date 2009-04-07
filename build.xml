@@ -79,6 +79,7 @@
       <fileset dir="${dir.src}">
         <include name="**/*.clj"/>
         <include name="**/*.st"/>
+        <include name="**/*.rb"/>
         <include name="org/altlaw/solr/conf/*"/>
       </fileset>
       <fileset dir=".">
