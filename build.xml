@@ -26,7 +26,6 @@
   <target name="clean"
           description="Delete compiled/generated files.">
     <delete dir="${dir.build}"/>
-    <delete dir="${dir.var}"/>
     <delete file="${basedir}/derby.log"/>
   </target>
 
