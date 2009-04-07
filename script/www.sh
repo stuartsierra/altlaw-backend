@@ -7,7 +7,7 @@ then
 fi
 
 ALTLAW_ENV=$1
-PID_FILE="var/www.${ALTLAW_ENV}.PID"
+PID_FILE="var/www.pid"
 
 source `dirname $0`/env.sh
 
@@ -18,7 +18,7 @@ function start {
 
     echo "Server running at PID $PID"
     mkdir -p var
-    echo $PID > var/www.pid
+    echo $PID > $PID_FILE
 }
 
 function stop {
