@@ -32,6 +32,7 @@
    org.altlaw.util.date
    org.altlaw.util.files
    org.altlaw.util.hadoop
+   org.altlaw.util.hadoop.SeqFileToFiles
    org.altlaw.util.log
    org.altlaw.util.lucene
    org.altlaw.util.markdown
