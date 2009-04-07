@@ -11,12 +11,7 @@ then
     ALTLAW_ENV="development"
 fi
 
-cd `dirname $0`
-cd ..
-
-HERE=`pwd`
-
-CLASSPATH="$HERE/src:$HERE/build/classes:$HERE/build/clj_classes:$HERE/lib/*"
+CLASSPATH="$ALTLAW_BACKEND/src:$ALTLAW_BACKEND/build/classes:$ALTLAW_BACKEND/build/clj_classes:$ALTLAW_BACKEND/lib/*"
 
 JAVA_OPTS="$JAVA_OPTS -XX:+UseConcMarkSweepGC -Xmx1024m"
 JAVA_OPTS="$JAVA_OPTS -Dorg.altlaw.home=$HERE"
