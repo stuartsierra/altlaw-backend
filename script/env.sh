@@ -16,7 +16,7 @@ cd ..
 
 HERE=`pwd`
 
-CLASSPATH="src:test:build/classes:build/clj_classes:lib/*"
+CLASSPATH="$HERE/src:$HERE/build/classes:$HERE/build/clj_classes:$HERE/lib/*"
 
 JAVA_OPTS="$JAVA_OPTS -XX:+UseConcMarkSweepGC -Xmx1024m"
 JAVA_OPTS="$JAVA_OPTS -Dorg.altlaw.home=$HERE"
