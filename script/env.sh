@@ -13,7 +13,7 @@ fi
 
 if [ -z "$ALTLAW_HOME" ]
 then
-    ALTLAW_HOME=(cd `dirname $0`/..; `pwd`)
+    ALTLAW_HOME=`dirname $0`/..
 fi
 
 CLASSPATH="$ALTLAW_HOME/src:$ALTLAW_HOME/build/classes:$ALTLAW_HOME/build/clj_classes:$ALTLAW_HOME/lib/*"
