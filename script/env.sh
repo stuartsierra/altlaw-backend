@@ -11,6 +11,11 @@ then
     ALTLAW_ENV="development"
 fi
 
+if [ -z "$ALTLAW_HOME" ]
+then
+    ALTLAW_HOME=(cd `dirname $0`/..; `pwd`)
+fi
+
 CLASSPATH="$ALTLAW_HOME/src:$ALTLAW_HOME/build/classes:$ALTLAW_HOME/build/clj_classes:$ALTLAW_HOME/lib/*"
 
 JAVA_OPTS="$JAVA_OPTS -XX:+UseConcMarkSweepGC -Xmx1024m"
