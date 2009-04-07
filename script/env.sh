@@ -11,7 +11,7 @@ then
     ALTLAW_ENV="development"
 fi
 
-CLASSPATH="$ALTLAW_BACKEND/src:$ALTLAW_BACKEND/build/classes:$ALTLAW_BACKEND/build/clj_classes:$ALTLAW_BACKEND/lib/*"
+CLASSPATH="$ALTLAW_HOME/src:$ALTLAW_HOME/build/classes:$ALTLAW_HOME/build/clj_classes:$ALTLAW_HOME/lib/*"
 
 JAVA_OPTS="$JAVA_OPTS -XX:+UseConcMarkSweepGC -Xmx1024m"
 JAVA_OPTS="$JAVA_OPTS -Dorg.altlaw.home=$HERE"
