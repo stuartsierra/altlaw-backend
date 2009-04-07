@@ -1,73 +1,92 @@
 (ns org.altlaw.jobs.pre.altcrawl
   (:require [org.altlaw.util.hadoop :as hadoop]
+            [org.altlaw.util.files :as files]
+            [org.altlaw.util.tsv :as tsv]
             [clojure.contrib.walk :as walk])
   (:use clojure.contrib.json.read
         org.altlaw.util.log)
-  (:import (org.apache.commons.codec.binary Base64)
-           (java.util Arrays)))
+  (:import (org.apache.commons.codec.binary Base64)))
 
 (hadoop/setup-mapreduce)
 
 (declare *reporter*)
 
-(defn- get-bytes [download]
-  (Base64/decodeBase64
-   (.getBytes (:response_body_base64 download)
-              "UTF-8")))
+(defn counter [group name]
+  (.incrCounter *reporter* group name 1))
 
-(defn- guess-mime-type
-  "Attempts to guess the MIME type of the data in a byte array.
-  Recognizes PDF and HTML.  Returns nil if it can't recognize the
-  type."
-  [bytes]
-  (let [magic (String. (Arrays/copyOf bytes 4) "UTF-8")]
-    (cond (= "%PDF" magic) "application/pdf"
-          (.contains magic "<") "text/html"
-          :else nil)))
+(def *docid-map* (ref {}))
 
-(defmulti handle-download
-  (fn [download] (guess-mime-type (get-bytes download))))
+(defn get-docid [uri]
+  (get @*docid-map* uri))
 
-(defmethod handle-download :default [download]
-  (.warn *log* (str "No handler for MIME type of "
-                    (:request_uri download))))
+(defn- decode-response-body [download]
+  (assoc download :response_body_bytes
+         (Base64/decodeBase64
+          (.getBytes (:response_body_base64 download) "UTF-8"))))
 
-(defmethod handle-download "application/pdf" [download]
-  (.debug *log* (str "handle-download got PDF from "
-                    (:request_uri download))))
+;;; Step 2: dispatch on MIME type of the download
 
-(defmethod handle-download "text/html" [download]
-  (.debug *log* (str "handle-download got HTML from "
-                    (:request_uri download))))
+(defmulti mime-type-dispatch
+  (fn [download]
+    (files/guess-mime-type-by-content (:response_body_bytes download))))
 
-(defmulti my-map
-  (fn [data]
-    (cond (contains? data :request_uri) :download
-          (contains? data :doctype) :metadata)))
+(defmethod mime-type-dispatch "application/pdf" [download]
+  (counter "MIME types" "PDF")
+  (debug "mime-type-dispatch got PDF from " (:request_uri download)))
 
-(defmethod my-map :download [data]
-  (let [uri (:request_uri data)
-        status (:response_status_code data)]
-    (.debug *log* (str "my-map got download from " uri))
-    (if (= 200 status)
-      (handle-download data)
-      (.warn *log* (str "my-map saw HTTP error " status
-                        " from " uri)))))
+(defmethod mime-type-dispatch "text/html" [download]
+  (counter "MIME types" "HTML")
+  (debug "mime-type-dispatch got HTML from " (:request_uri download)))
 
-(defmethod my-map :metadata [data]
-  (.debug *log* (str "my-map got metadata for "
-                     (:name data))))
+(defmethod mime-type-dispatch :default [download]
+  (counter "MIME types" "unknown")
+  (warn "mime-type-dispatch found no handler for " (:request_uri download)))
+
+
+;;; Step 1: dispatch on Status code of the download
+
+(defn status-code-dispatch [download]
+  (counter "Status codes" (str (:response_status_code download)))
+  (if (= 200 (:response_status_code download))
+    (mime-type-dispatch download)
+    (warn "status-code-dispatch saw "
+          (:response_status_code download)
+          " from " (:request_uri download))))
+
+
+(defn my-map [download]
+  (status-code-dispatch (decode-response-body download)))
+
+
+
+;;; MAPPER METHODS
+
+(defn mapper-configure [this job]
+  (let [cached (DistributedCache/getLocalCacheFiles job)
+        path (first (filter #(= (.getName %) "docids.tsv.gz") cached))]
+    (when (nil? path) (throw (RuntimeException. "No docid.tsv.gz in DistributedCache.")))
+    (info "Loading docid map from " path)
+    (dosync (ref-set *docid-map* (tsv/load-tsv-map (str path))))))
 
 (defn mapper-map [this wkey wvalue output reporter]
     (let [input (walk/keywordize-keys (read-json-string (str wvalue)))]
-      (.debug *log* (str "Called map with file position " wkey
-                         " and value " (logstr input)))
+      (debug "Called map with file position " wkey
+             " and value " (logstr input))
       (binding [*reporter* reporter]
         (doseq [[key value] (my-map input)]
           (.collect output (Text. key) (Text. value))))))
 
-(defn reducer-reduce [this wkey wvalues output reporter]
-  (.debug *log* (str "Called reduce with key " wkey)))
+
+
+;;; REDUCER METHODS
+
+(defn reducer-reduce [this wkey values-iter output reporter]
+  (debug "Called reduce with key " wkey " and "
+         (count (iterator-seq values-iter)) " values."))
+
+
+
+;;; TOOL METHODS
 
 (defn tool-run [this args]
   (let [job (hadoop/default-jobconf this)
@@ -81,5 +100,6 @@
     (.setMapperClass job (Class/forName "org.altlaw.jobs.pre.altcrawl_mapper"))
     (.setReducerClass job (Class/forName "org.altlaw.jobs.pre.altcrawl_reducer"))
     (.setMapOutputKeyClass job Text)
+    (DistributedCache/addCacheFile (URI. (hadoop/docid-path :seqfiles :ohm1)) job)
     (JobClient/runJob job))
   0)
