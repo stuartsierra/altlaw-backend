@@ -1,6 +1,6 @@
 (ns org.altlaw.util.files
   (:use [clojure.contrib.test-is :only (with-test is)])
-  (:import (java.io File)))
+  (:import (java.io File) (java.util Arrays)))
 
 (defn relative-path
   "Returns the path of file relative to dir, as a String.  The file
@@ -43,4 +43,16 @@
 (defn guess-mime-type-by-name [#^File file]
   (let [extension (.toLowerCase #^String (last (.split (str file) "\\.")))]
     (*extension-mime-types* extension)))
+
+(defn guess-mime-type-by-content 
+  "Attempts to guess the MIME type of the data in a byte array.
+  Recognizes PDF and HTML.  Returns nil if it can't recognize the
+  type."
+  [bytes]
+  (let [sample-size (min (count bytes) 50)
+        magic (String. (Arrays/copyOf bytes sample-size) "ISO-8859-1")]
+    ;; Read as ISO-8859-1 so there are no invalid bytes.
+    (cond (.startsWith magic "%PDF") "application/pdf"
+          (.contains magic "<") "text/html"
+          :else nil)))
 
