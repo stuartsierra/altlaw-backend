@@ -52,7 +52,6 @@ cd /mnt
 git clone --depth 1 git://github.com/lawcommons/altlaw-backend.git
 cd altlaw-backend
 ant
-ant gen.static
 
 # install Hadoop
 cd /mnt
