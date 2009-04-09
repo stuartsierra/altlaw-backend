@@ -4,6 +4,11 @@
 
 (hadoop/setup-mapreduce)
 
+(defn mapper-configure [this jobconf]
+  (alter-var-root #'org.altlaw.util.context/get-property
+                  (fn [_] (fn [name] (or (.get jobconf name)
+                                         (throw (Exception. (str "Missing property " name))))))))
+
 (defn mapper-map [this wkey wvalue output reporter]
   (let [docid (.get wkey)
         doc (read-string (str wvalue))]
