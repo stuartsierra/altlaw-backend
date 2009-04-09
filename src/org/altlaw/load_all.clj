@@ -1,7 +1,5 @@
 (ns org.altlaw.load-all
   (:require 
-   org.altlaw.internal.application
-
    org.altlaw.jobs.distindex
    org.altlaw.jobs.genhtml
    org.altlaw.jobs.getindexes
@@ -19,11 +17,6 @@
    org.altlaw.jobs.procfiles.profed
    org.altlaw.jobs.procfiles.profed-map
 
-   org.altlaw.test.internal
-   org.altlaw.test.internal.idserver.impl
-   org.altlaw.test.internal.idserver.client
-   org.altlaw.test.internal.privacy.impl
-   org.altlaw.test.internal.privacy.client
    org.altlaw.test.run
    org.altlaw.test.www
    org.altlaw.test.www.search
