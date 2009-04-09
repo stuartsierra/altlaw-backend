@@ -81,7 +81,8 @@
   (let [escaped (escape-fields doc)]
     (tmpl/render :xhtml_page
                  :html_title (str (:name escaped) " - AltLaw")
-                 :html_head (tmpl/render :default_html_head)
+                 :html_head (tmpl/render :default_html_head
+                                         :norobots true)
                  :html_body (gen-case-layout type escaped))))
 
 (defn all-files [doc]
@@ -126,4 +127,5 @@
     (is (re-find #"Bob v. Marley" page))
     (is (re-find #"/v1/cases/2079" page))
     (is (re-find #"February 19, 2006" page))
-    (is (re-find #"United States Court of Appeals for the Fifth Circuit" page))))
+    (is (re-find #"United States Court of Appeals for the Fifth Circuit" page))
+    (is (re-find #"robots.*noindex" page))))
