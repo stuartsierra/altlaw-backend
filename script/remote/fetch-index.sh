@@ -1,6 +1,6 @@
 #!/bin/sh
 
-source `dirname $0`/remote-env.sh
+source `dirname $0`/../env.sh
 
 INDEX_DIR=$ALTLAW_HOME/var/solr/data/index
 
