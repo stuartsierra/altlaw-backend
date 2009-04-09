@@ -18,20 +18,6 @@
   []
   (get-property "org.altlaw.env"))
 
-(defn internal-uri
-  "The base URI of the internal.altlaw.org server.  String, includes
-  the scheme and host name, but not the initial slash."
-  []
-  (get-property "org.altlaw.internal.uri"))
-
-(defn internal-db
-  "The DB description for clojure.contrib.sql/with-connection"
-  []
-  {:classname "org.apache.derby.jdbc.EmbeddedDriver"
-   :subprotocol "derby"
-   :subname (java.io.File. (str (altlaw-home) "/var/db/" (altlaw-env)))
-   :create true})
-
 (defn www-content-dir
   "Root directory for markdown content files for 'about' pages on
   www.altlaw.org" []
