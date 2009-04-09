@@ -1,9 +1,7 @@
 #!/bin/bash
 
-cd `dirname $0`/..
-
 S3_BUCKET=altlaw.org
-AMI_NAME=www
+AMI_NAME=www2
 HADOOP_VERSION=0.18.4-dev
 
 # Location of EC2 keys.  The default setting is probably OK if you set
@@ -43,14 +41,21 @@ done
 
 
 cat > /tmp/remote-prepare-www.sh <<EOF
-#!/bin/sh
+#!/bin/bash
 
-chmod 0600 /root/.awssecret
+if [ -z "\$ALTLAW_HOME" ]; then
+    echo "Error: ALTLAW_HOME not set"
+    exit 1
+fi
+
+if [ -z "\$HADOOP_HOME" ]; then
+    echo "Error: HADOOP_HOME not set"
+    exit 1
+fi
 
 # install AltLaw
-cd /mnt
-git clone --depth 1 git://github.com/lawcommons/altlaw-backend.git
-cd altlaw-backend
+git clone --depth 1 git://github.com/lawcommons/altlaw-backend.git \$ALTLAW_HOME
+cd \$ALTLAW_HOME
 ant
 
 # install Hadoop
@@ -58,27 +63,25 @@ cd /mnt
 aws get altlaw.org/v4/hadoop-for-www.tar.gz hadoop.tar.gz
 tar xzf hadoop.tar.gz
 # Find the untarred Hadoop dir, rename it:
-find . -maxdepth 1 -type d -name 'hadoop-*' -exec mv '{}' hadoop \;
-
-# Generate a local SSH key, so Hadoop local config works:
-ssh-keygen -t dsa -P '' -f ~/.ssh/id_dsa
-cat ~/.ssh/id_dsa.pub >> ~/.ssh/authorized_keys
+find . -maxdepth 1 -type d -name 'hadoop-*' -exec mv '{}' \$HADOOP_HOME \;
+# Delete tar file:
+rm /mnt/hadoop.tar.gz
 
 # Prepare local Hadoop namenode, for s3dfs access:
-cd /mnt/hadoop
+cd \$HADOOP_HOME
 bin/hadoop namenode -format
 
 EOF
 
 
 # Copy .awssecret file:
-scp $SSH_OPTS ~/.awssecret root@$HOST:
+scp $SSH_OPTS -p ~/.awssecret root@$HOST:
 
 # Copy scripts:
 scp $SSH_OPTS /tmp/remote-prepare-www.sh root@$HOST:
 
 # Run the startup script:
-ssh $SSH_OPTS root@$HOST "sh remote-prepare-www.sh"
+ssh $SSH_OPTS root@$HOST "bash remote-prepare-www.sh"
 
 # Login
 ssh $SSH_OPTS root@$HOST
