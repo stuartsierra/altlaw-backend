@@ -37,3 +37,9 @@
   "Solr home directory for running Solr instances."
   []
   (java.io.File. (str (altlaw-home) "/var/solr")))
+
+(defn aws-access-key-id []
+  (get-property "org.altlaw.aws.access.key.id"))
+
+(defn aws-secret-access-key []
+  (get-property "org.altlaw.aws.secret.access.key"))
