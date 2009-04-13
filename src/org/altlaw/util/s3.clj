@@ -41,3 +41,6 @@
   (into {} (.getMetadataMap
             (.getObjectDetails (get-s3) (get-bucket bucket-name)
                                object-key))))
+
+(defn get-object-stream [bucket-name object-key]
+  (.getDataInputStream (get-object bucket-name object-key)))
