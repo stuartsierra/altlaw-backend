@@ -1,5 +1,6 @@
 (ns org.altlaw.util.s3
-  (:require [org.altlaw.util.zip :as zip])
+  (:require [org.altlaw.util.zip :as zip]
+            [org.altlaw.util.context :as context])
   (:import (org.jets3t.service.impl.rest.httpclient RestS3Service)
            (org.jets3t.service.model S3Bucket S3Object)
            (org.jets3t.service.security AWSCredentials)
@@ -9,8 +10,8 @@
 
 (def #^{:private true} get-s3
      (memoize (fn [] (RestS3Service.
-                      (AWSCredentials. (System/getenv "AWS_ACCESS_KEY_ID")
-                                       (System/getenv "AWS_SECRET_ACCESS_KEY"))))))
+                      (AWSCredentials. (context/aws-access-key-id)
+                                       (context/aws-secret-access-key))))))
 
 (def #^{:private true} get-bucket
      (memoize (fn [x]
