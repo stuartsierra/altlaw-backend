@@ -45,7 +45,11 @@
   (java.io.File. (str (altlaw-home) "/var/solr")))
 
 (defn aws-access-key-id []
-  (get-property "org.altlaw.aws.access.key.id"))
+  (or (get-property-function "org.altlaw.aws.access.key.id")
+      (get-property-function "fs.s3.awsAccessKeyId")
+      (throw (Exception. "No AWS Access Key ID (tried org.altlaw.aws.access.key.id and fs.s3.awsAccessKeyID)"))))
 
 (defn aws-secret-access-key []
-  (get-property "org.altlaw.aws.secret.access.key"))
+  (or (get-property-function "org.altlaw.aws.secret.access.key")
+      (get-property-function "fs.s3.awsSecretAccessKey")
+      (throw (Exception. "No AWS Secret Access Key (tried org.altlaw.aws.secret.access.key and fs.s3.awsSecretAccessKey)"))))
