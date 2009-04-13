@@ -3,6 +3,9 @@
 (defn get-property-function [name]
   (System/getProperty name))
 
+(defn use-property-function [f]
+  (alter-var-root #'get-property-function (fn [_] f)))
+
 (defn get-property [name]
   (or (get-property-function name)
       (throw (Exception. (str "Missing property " name)))))
