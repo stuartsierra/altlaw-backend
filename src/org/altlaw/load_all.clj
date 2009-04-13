@@ -16,6 +16,7 @@
    org.altlaw.jobs.procfiles.ohm1-map
    org.altlaw.jobs.procfiles.profed
    org.altlaw.jobs.procfiles.profed-map
+   org.altlaw.jobs.uploadpages
 
    org.altlaw.test.run
    org.altlaw.test.www
@@ -30,6 +31,7 @@
    org.altlaw.util.lucene
    org.altlaw.util.markdown
    org.altlaw.util.solr
+   org.altlaw.util.s3
    org.altlaw.util.zip
 
    org.altlaw.www.render
