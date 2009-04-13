@@ -1,7 +1,13 @@
 (ns org.altlaw.util.context)
 
+(defn get-property-function [name]
+  (System/getProperty name))
+
+(defn use-property-function [f]
+  (alter-var-root #'get-property-function (fn [_] f)))
+
 (defn get-property [name]
-  (or (System/getProperty name)
+  (or (get-property-function name)
       (throw (Exception. (str "Missing property " name)))))
 
 
@@ -17,20 +23,6 @@
   One of production/development/testing."
   []
   (get-property "org.altlaw.env"))
-
-(defn internal-uri
-  "The base URI of the internal.altlaw.org server.  String, includes
-  the scheme and host name, but not the initial slash."
-  []
-  (get-property "org.altlaw.internal.uri"))
-
-(defn internal-db
-  "The DB description for clojure.contrib.sql/with-connection"
-  []
-  {:classname "org.apache.derby.jdbc.EmbeddedDriver"
-   :subprotocol "derby"
-   :subname (java.io.File. (str (altlaw-home) "/var/db/" (altlaw-env)))
-   :create true})
 
 (defn www-content-dir
   "Root directory for markdown content files for 'about' pages on
@@ -51,3 +43,13 @@
   "Solr home directory for running Solr instances."
   []
   (java.io.File. (str (altlaw-home) "/var/solr")))
+
+(defn aws-access-key-id []
+  (or (get-property-function "org.altlaw.aws.access.key.id")
+      (get-property-function "fs.s3.awsAccessKeyId")
+      (throw (Exception. "No AWS Access Key ID (tried org.altlaw.aws.access.key.id and fs.s3.awsAccessKeyID)"))))
+
+(defn aws-secret-access-key []
+  (or (get-property-function "org.altlaw.aws.secret.access.key")
+      (get-property-function "fs.s3.awsSecretAccessKey")
+      (throw (Exception. "No AWS Secret Access Key (tried org.altlaw.aws.secret.access.key and fs.s3.awsSecretAccessKey)"))))

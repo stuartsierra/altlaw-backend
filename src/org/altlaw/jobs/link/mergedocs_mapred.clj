@@ -3,7 +3,6 @@
      :extends org.apache.hadoop.mapred.MapReduceBase
      :implements [org.apache.hadoop.mapred.Reducer])
     (:require [org.altlaw.util.context :as context]
-              [org.altlaw.internal.privacy.client :as privacy]
               [org.altlaw.util.merge-fields :as merge])
     (:use org.altlaw.util.hadoop))
 
@@ -15,7 +14,7 @@
 
 (defn -configure [this jobconf]
   (binding [context/get-property (fn [name] (.get jobconf name))]
-    (dosync (ref-set *removed-docids* (privacy/get-removed)))
+    (dosync (ref-set *removed-docids* {}))
     (.info *log* (str "The following docids have been removed: "
                       (pr-str @*removed-docids*)))))
 

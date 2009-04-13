@@ -12,14 +12,6 @@
     (name x)
     (str x)))
 
-(def *template-group*
-     (let [page-templates (StringTemplateGroup. "org.altlaw.www.templates")]
-       (when (= (context/altlaw-env) "development")
-         ;; By default, templates are never refreshed.
-         ;; In development mode, always refresh.
-         (.setRefreshInterval page-templates 0))
-       page-templates))
-
 (with-test
  (defn- render-template
    "Assigns attributes to a StringTemplate and renders it.  Attributes
@@ -61,13 +53,22 @@
                                    "Foo: $user:{f$it.foo$}$")
                                   {:user [{:foo 1} {:foo 2} {:foo 3}]})))))
 
+(def #^{:private true} template-group
+     (memoize (fn []
+                (let [page-templates (StringTemplateGroup. "org.altlaw.www.templates")]
+                  ;; By default, templates are never refreshed.
+                  ;; In development mode, always refresh.
+                  (when (= (context/altlaw-env) "development")
+                    (.setRefreshInterval page-templates 0))
+                  page-templates))))
+
 (with-test
  (defn render
    "Renders a template from a file.  name does not include the '.st'
    extension.  attrs is a :keyword=>value map as with
    render-template."
    [name & attrs]
-   (-> *template-group*
+   (-> (template-group)
        (.getInstanceOf (str "org/altlaw/www/templates/" (string name)))
        (render-template (if (map? (first attrs))
                           (if (next attrs)
