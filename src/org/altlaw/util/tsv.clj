@@ -2,7 +2,7 @@
 
 (ns org.altlaw.util.tsv
   (:import (java.io BufferedReader InputStreamReader
-                    FileInputStream)
+                    FileInputStream InputStream)
            (java.util.zip GZIPInputStream)))
 
 (defn read-tsv-stream
@@ -15,7 +15,7 @@
     (reduce (fn [map #^String line]
               (let [[#^String key value] (.split line "\t")]
                 (assoc map key value)))
-            {} (line-seq stream))))
+            {} (line-seq reader))))
 
 (defn write-tsv-stream
   "Writes a gzip-compressed binary stream of a tab-separated-value
