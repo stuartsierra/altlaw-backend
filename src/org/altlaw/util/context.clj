@@ -1,7 +1,10 @@
 (ns org.altlaw.util.context)
 
+(defn get-property-function [name]
+  (System/getProperty name))
+
 (defn get-property [name]
-  (or (System/getProperty name)
+  (or (get-property-function name)
       (throw (Exception. (str "Missing property " name)))))
 
 
