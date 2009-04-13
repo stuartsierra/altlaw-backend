@@ -1,6 +1,5 @@
 (ns org.altlaw.www.case-pages
   (:require [org.altlaw.util.string :as str]
-            [org.altlaw.util.files :as files]
             [org.altlaw.www.render :as tmpl]
             [org.altlaw.util.courts :as courts]
             [org.altlaw.util.date :as date]
@@ -24,18 +23,21 @@
 
 (defn- url-path-for-docid [type docid]
   (if (= type :text)
-    (str "/v1/cases/" docid)
-    (str "/v1/cases/" docid "/" (name type))))
+    (str "v1/cases/" docid)
+    (str "v1/cases/" docid "/" (name type))))
+
+(defn- absolute-url-path-for-docid [type docid]
+  (str "/" (url-path-for-docid type docid)))
+
+(defn- file-path-for-docid [type docid format]
+  (str (url-path-for-docid type docid) "." format))
 
 (defn- doclinks [doc]
   (let [docid (:docid doc)]
     [{:name "Full Text"
-      :url (url-path-for-docid :text docid)}
+      :url (absolute-url-path-for-docid :text docid)}
      {:name "Citations to/from this"
-      :url (url-path-for-docid :citations docid)}]))
-
-(defn- file-path-for-docid [type docid]
-  (str "docs/" (files/docid-path docid) "-" (name type) ".html"))
+      :url (absolute-url-path-for-docid :citations docid)}]))
 
 (defmulti #^{:private true} gen-case-layout (fn [type doc] type))
 
@@ -57,7 +59,7 @@
 (defn- prepare-citelinks [cites]
   (map (fn [doc]
          (assoc (escape-fields doc)
-           :url (url-path-for-docid :text (:docid doc))
+           :url (absolute-url-path-for-docid :text (:docid doc))
            :name (str/truncate (:name doc) 30)))
        (reverse (sort-by :date cites))))
   
@@ -82,12 +84,12 @@
     (tmpl/render :xhtml_page
                  :html_title (str (:name escaped) " - AltLaw")
                  :html_head (tmpl/render :default_html_head
-                                         :norobots true)
+                                         :norobots (= type :citations))
                  :html_body (gen-case-layout type escaped))))
 
 (defn all-files [doc]
   (reduce (fn [m type]
-            (assoc m (file-path-for-docid type (:docid doc))
+            (assoc m (file-path-for-docid type (:docid doc) "html")
                    (gen-case-page type doc)))
           {} [:text :citations]))
 
@@ -106,7 +108,8 @@
     (is (re-find #"<.*class=\"name\".*>John &amp; Sons v\. Thurber</" page))
     (is (re-find #"<.*class=\"date\".*>January 4, 2009</" page))
     (is (re-find #"<.*class=\"citations\".*>1 F.2d 101; 5 L.Ed. 102</" page))
-    (is (re-find #"<.*class=\"court\".*>United States Court of Appeals for the Third Circuit</" page))))
+    (is (re-find #"<.*class=\"court\".*>United States Court of Appeals for the Third Circuit</" page))
+    (is (not (re-find #"robots.*noindex" page)))))
 
 
 (deftest- can-generate-cites-page
