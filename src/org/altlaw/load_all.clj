@@ -9,8 +9,8 @@
    org.altlaw.jobs.link.linkincites-mapred
    org.altlaw.jobs.link.linkoutcites
    org.altlaw.jobs.link.linkoutcites-mapred
-   ;org.altlaw.jobs.link.mergedocs
-   ;org.altlaw.jobs.link.mergedocs-mapred
+   org.altlaw.jobs.link.mergedocs
+   org.altlaw.jobs.link.mergedocs-mapred
    org.altlaw.jobs.procfiles.altcrawl
    org.altlaw.jobs.procfiles.ohm1
    org.altlaw.jobs.procfiles.ohm1-map
