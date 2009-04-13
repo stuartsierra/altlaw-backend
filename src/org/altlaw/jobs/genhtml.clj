@@ -1,18 +1,18 @@
 (ns org.altlaw.jobs.genhtml
   (:require [org.altlaw.util.hadoop :as hadoop]
+            [org.altlaw.util.log :as log]
+            [org.altlaw.util.context :as context]
             [org.altlaw.www.case-pages :as cases]))
 
 (hadoop/setup-mapreduce)
 
 (defn mapper-configure [this jobconf]
-  (alter-var-root #'org.altlaw.util.context/get-property
-                  (fn [_] (fn [name] (or (.get jobconf name)
-                                         (throw (Exception. (str "Missing property " name))))))))
+  (context/use-property-function (fn [name] (.get jobconf name))))
 
 (defn mapper-map [this wkey wvalue output reporter]
   (let [docid (.get wkey)
         doc (read-string (str wvalue))]
-    (.debug *log* (str "Mapper got document " docid))
+    (log/debug "Mapper got document " docid)
     (doseq [[filename content] (cases/all-files doc)]
       (.collect output (Text. filename) 
                 (BytesWritable. (.getBytes content "UTF-8"))))))
