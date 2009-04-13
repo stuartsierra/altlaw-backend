@@ -43,4 +43,8 @@ case "$2" in
         stop;
         start;
         ;;
+    *)
+        echo "Invalid command: $2"
+        echo "Run without arguments for usage."
+        exit 1
 esac
