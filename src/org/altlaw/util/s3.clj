@@ -84,3 +84,14 @@
     (.setContentLength object (count bytes))
     (.setDataInputStream object (ByteArrayInputStream. bytes))
     (.putObject (get-s3) bucket object)))
+
+(defn put-object-gzip-bytes
+  [bucket-name object-key bytes metadata]
+  (let [bucket (get-bucket bucket-name)
+        object (S3Object. bucket object-key)
+        gzipped-bytes (zip/gzip-bytes bytes)]
+    (.addAllMetadata object metadata)
+    (.setContentEncoding object "gzip")
+    (.setContentLength object (count bytes))
+    (.setDataInputStream object (ByteArrayInputStream. gzipped-bytes))
+    (.putObject (get-s3) bucket object)))
