@@ -45,6 +45,14 @@
           (.closeEntry in)
           (recur (.getNextEntry in)))))))
 
+(defn gzip-bytes [bytes]
+  (let [input (ByteArrayInputStream. bytes)
+        output (ByteArrayOutputStream.)
+        gzip-output (GZIPOutputStream. output)]
+    (IOUtils/copy input gzip-output)
+    (.close gzip-output)
+    (.toByteArray output)))
+
 (defn gzip-utf8-string
   "Converts a string to gzipped UTF-8 text, returns a byte array."
   [s]
