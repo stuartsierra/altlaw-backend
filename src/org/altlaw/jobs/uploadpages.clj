@@ -12,11 +12,15 @@
 (defn mapper-configure [this jobconf]
   (context/use-property-function (fn [name] (.get jobconf name))))
 
+(def *empty-bytes* (BytesWritable.))
+
 (defn mapper-map [this wkey wvalue output reporter]
   (log/debug "Mapper got file " wkey)
   (content/put-page-bytes (str wkey) 
                           (Arrays/copyOf (.get wvalue) (.getSize wvalue))
-                          "text/html"))
+                          "text/html")
+  (.incrCounter reporter "org.altlaw.jobs.uploadpages" "Uploaded objects" 1)
+  (.collect output wkey *empty-bytes*))
 
 (defn tool-run [this args]
   (let [job (hadoop/default-jobconf this)
