@@ -22,9 +22,6 @@
     (.setReducerClass job org.altlaw.jobs.link.mergedocs_mapred)
     (.setOutputKeyClass job IntWritable)
     (.setOutputValueClass job Text)
-    
-    (println "Internal base URI is " (.get job "org.altlaw.internal.base"))
-
     (JobClient/runJob job))
   0)
 
