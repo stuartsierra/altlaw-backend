@@ -1,7 +1,9 @@
 (ns org.altlaw.util.zip
-  (:import (java.io File FileOutputStream FileInputStream)
-           (java.util.zip GZIPInputStream ZipOutputStream
-                          ZipEntry ZipInputStream)
+  (:import (java.io File FileOutputStream FileInputStream
+                    InputStream OutputStream
+                    ByteArrayInputStream ByteArrayOutputStream)
+           (java.util.zip GZIPInputStream GZIPOutputStream
+                          ZipInputStream ZipOutputStream ZipEntry)
            (org.apache.commons.io FileUtils IOUtils)))
 
 (defn write-zip-file
@@ -42,4 +44,14 @@
               (IOUtils/copy in out)))
           (.closeEntry in)
           (recur (.getNextEntry in)))))))
+
+(defn gzip-utf8-string
+  "Converts a string to gzipped UTF-8 text, returns a byte array."
+  [s]
+  (let [input (ByteArrayInputStream. (.getBytes s "UTF-8"))
+        output (ByteArrayOutputStream.)
+        gzip-output (GZIPOutputStream. output)]
+    (IOUtils/copy input gzip-output)
+    (.close gzip-output)
+    (.toByteArray output)))
 
