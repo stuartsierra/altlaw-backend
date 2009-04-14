@@ -80,8 +80,8 @@
 
 (defn get-object-string [bucket-name object-key]
   (catch-s3-errors
-   (IOUtils/toString (get-object-stream bucket-name object-key)
-                     "UTF-8")))
+   (with-open [stream (get-object-stream bucket-name object-key)]
+     (IOUtils/toString stream "UTF-8"))))
 
 (defn put-object-stream [bucket-name object-key stream metadata]
   (catch-s3-errors
