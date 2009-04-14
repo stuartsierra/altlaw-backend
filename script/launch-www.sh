@@ -43,15 +43,8 @@ done
 cat > /tmp/remote-prepare-www.sh <<EOF
 #!/bin/bash
 
-if [ -z "\$ALTLAW_HOME" ]; then
-    echo "Error: ALTLAW_HOME not set"
-    exit 1
-fi
-
-if [ -z "\$HADOOP_HOME" ]; then
-    echo "Error: HADOOP_HOME not set"
-    exit 1
-fi
+ALTLAW_HOME=/mnt/altlaw
+HADOOP_HOME=/mnt/hadoop
 
 # install AltLaw
 git clone --depth 1 git://github.com/lawcommons/altlaw-backend.git \$ALTLAW_HOME
@@ -73,6 +66,9 @@ bin/hadoop namenode -format
 
 EOF
 
+
+# Wait before trying to connect
+sleep 10
 
 # Copy .awssecret file:
 scp $SSH_OPTS -p ~/.awssecret root@$HOST:
