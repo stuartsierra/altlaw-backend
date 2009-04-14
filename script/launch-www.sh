@@ -46,19 +46,8 @@ cat > /tmp/remote-prepare-www.sh <<EOF
 echo "export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> ~/.bashrc
 echo "export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> ~/.bashrc
 
-source ~/.bashrc
-
-if [ -z "\$ALTLAW_HOME" ]
-then
-    echo "Error: ALTLAW_HOME not set"
-    exit 1
-fi
-
-if [ -z "\$HADOOP_HOME" ]
-then
-    echo "Error: HADOOP_HOME not set"
-    exit 1
-fi
+ALTLAW_HOME=/mnt/altlaw
+HADOOP_HOME=/mnt/hadoop
 
 # install AltLaw
 git clone --depth 1 git://github.com/lawcommons/altlaw-backend.git \$ALTLAW_HOME
