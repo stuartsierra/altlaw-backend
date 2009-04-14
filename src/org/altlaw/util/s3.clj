@@ -1,7 +1,8 @@
 (ns org.altlaw.util.s3
   (:require [org.altlaw.util.zip :as zip]
             [org.altlaw.util.context :as context]
-            [org.altlaw.util.log :as log])
+            [org.altlaw.util.log :as log]
+            [clojure.contrib.singleton :as sing])
   (:import (org.jets3t.service S3Service)
            (org.jets3t.service.impl.rest.httpclient RestS3Service)
            (org.jets3t.service.model S3Bucket S3Object)
@@ -19,20 +20,21 @@
                               " " (. e# getS3ErrorMessage)) e#)))))
 
 (def #^{:private true} get-s3
-     (memoize (fn []                 
-                (log/debug "Called get-s3 memoized fn")
-                (log/info "Using jets3t library version "
-                          S3Service/VERSION_NO__JETS3T_TOOLKIT)
-                (RestS3Service.
-                 (AWSCredentials. (context/aws-access-key-id)
-                                  (context/aws-secret-access-key))))))
+     (sing/per-thread-singleton
+      (fn []                 
+        (log/info "get-s3: Using jets3t library version "
+                  S3Service/VERSION_NO__JETS3T_TOOLKIT)
+        (RestS3Service.
+         (AWSCredentials. (context/aws-access-key-id)
+                          (context/aws-secret-access-key))))))
 
 (def #^{:private true} get-bucket
-     (memoize (fn [x]
-                (log/debug "Called get-bucket memoized fn on " (pr-str x))
-                (if (instance? S3Bucket x) x
-                    ;; .getBucket is not supported in jets3t 6.0, included in Hadoop
-                    (S3Bucket. x)))))
+     (memoize
+      (fn [x]
+        (log/debug "Called get-bucket memoized fn on " (pr-str x))
+        (if (instance? S3Bucket x) x
+            ;; .getBucket is not supported in jets3t 6.0, included in Hadoop
+            (S3Bucket. x)))))
 
 (defn- make-bucket-symbol [bucket]
   (with-meta (symbol (.getName bucket))
