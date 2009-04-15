@@ -17,8 +17,8 @@
     [(read-string (s3/get-object-string object))
      {:etag (metadata "ETag")}]))
 
-(def get-data
-     "Returns a ref to the data object with the given name."
+(def #^{:doc "Returns a ref to the data object with the given name."}
+     get-data
      (memoize
       (fn [name]
         (let [[data meta] (fetch-data name)]
