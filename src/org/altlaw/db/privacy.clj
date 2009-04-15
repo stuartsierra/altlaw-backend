@@ -2,7 +2,7 @@
   (:require [org.altlaw.db.data :as data]
             [clojure.set :as set]))
 
-(defn- norobots-data []
+(defn get-norobots []
   (data/get-data "norobots"))
 
 (defn create-norobots
@@ -13,7 +13,7 @@
 (defn add-norobots
   "Adds a collection of document IDs to the norobots store."
   [docids]
-  (dosync (commute (norobots-data) set/union (set docids))))
+  (dosync (commute (get-norobots) set/union (set docids))))
 
 (defn save-norobots
   "Save the norobots store."
@@ -23,4 +23,4 @@
 (defn norobots?
   "Check if the given docid is in the norobots store."
   [docid]
-  (contains? @(norobots-data) docid))
+  (contains? @(get-norobots) docid))
