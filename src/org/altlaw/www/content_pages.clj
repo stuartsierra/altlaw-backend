@@ -20,7 +20,8 @@
   (let [[contenthead contentbody] (seq (.split markdown-text "---\n" 2))]
     (render :xhtml_page
             :html_title "AltLaw, the free legal search engine"
-            :html_head (render :default_html_head)
+            :html_head (render :default_html_head
+                               :verify true)
             :html_body (render :default_layout
                                :page_class "doctype_about"
                                :content_head (markdown contenthead)

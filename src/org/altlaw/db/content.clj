@@ -3,6 +3,9 @@
 
 (def #^{:private true} *bucket* "content.altlaw.org")
 
+(defn put-page-string [path string mime-type]
+  (s3/put-object-gzip-string *bucket* (str "www/" path) string {}))
+
 (defn put-page-bytes [path bytes mime-type]
   (s3/put-object-gzip-bytes *bucket* (str "www/" path) bytes {}))
 
