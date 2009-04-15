@@ -54,21 +54,28 @@
 (defn get-object [bucket-name object-key]
   (.getObject (get-s3) (get-bucket bucket-name) object-key))
 
-(defn get-object-meta [bucket-name object-key]
-  (into {} (.getMetadataMap
-            (.getObjectDetails (get-s3) (get-bucket bucket-name)
-                               object-key))))
+(defn get-object-meta
+  ([object]
+     (into {} (.getMetadataMap object)))
+  ([bucket-name object-key]
+     (into {} (.getMetadataMap
+               (.getObjectDetails (get-s3) (get-bucket bucket-name)
+                                  object-key)))))
 
-(defn get-object-stream [bucket-name object-key]
-  (let [object (get-object bucket-name object-key)
-        input (.getDataInputStream object)]
-    (if (= (.getContentEncoding object) "gzip")
-      (GZIPInputStream. input)
-      input)))
+(defn get-object-stream
+  ([object] 
+     (let [input (.getDataInputStream object)]
+       (if (= (.getContentEncoding object) "gzip")
+         (GZIPInputStream. input)
+         input)))
+  ([bucket-name object-key]
+     (get-object-stream (get-object bucket-name object-key))))
 
-(defn get-object-string [bucket-name object-key]
-  (IOUtils/toString (get-object-stream bucket-name object-key)
-                    "UTF-8"))
+(defn get-object-string 
+  ([object]
+     (IOUtils/toString (get-object-stream object) "UTF-8"))
+  ([bucket-name object-key]
+     (IOUtils/toString (get-object-stream bucket-name object-key) "UTF-8")))
 
 (defn put-object-stream [bucket-name object-key stream metadata]
   (let [bucket (get-bucket bucket-name)
