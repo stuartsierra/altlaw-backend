@@ -3,6 +3,7 @@
             [org.altlaw.www.render :as tmpl]
             [org.altlaw.util.courts :as courts]
             [org.altlaw.util.date :as date]
+            [org.altlaw.db.privacy :as priv]
             [clojure.contrib.duck-streams :as duck])
   (:use [clojure.contrib.test-is :only (deftest- with-test is)]))
 
@@ -84,7 +85,8 @@
     (tmpl/render :xhtml_page
                  :html_title (str (:name escaped) " - AltLaw")
                  :html_head (tmpl/render :default_html_head
-                                         :norobots (= type :citations))
+                                         :norobots (or (= type :citations)
+                                                       (priv/norobots? (:docid doc))))
                  :html_body (gen-case-layout type escaped))))
 
 (defn all-files [doc]
