@@ -70,18 +70,24 @@
              (.getObjectDetails (get-s3) (get-bucket bucket-name)
                                 object-key)))))
 
-(defn get-object-stream [bucket-name object-key]
-  (catch-s3-errors
-   (let [object (get-object bucket-name object-key)
-         input (.getDataInputStream object)]
-     (if (= (.getContentEncoding object) "gzip")
-       (GZIPInputStream. input)
-       input))))
+(defn get-object-stream
+  ([object] 
+     (catch-s3-errors
+      (let [input (.getDataInputStream object)]
+        (if (= (.getContentEncoding object) "gzip")
+          (GZIPInputStream. input)
+          input))))
+  ([bucket-name object-key]
+     (catch-s3-errors
+      (get-object-stream (get-object bucket-name object-key)))))
 
-(defn get-object-string [bucket-name object-key]
-  (catch-s3-errors
-   (with-open [stream (get-object-stream bucket-name object-key)]
-     (IOUtils/toString stream "UTF-8"))))
+(defn get-object-string 
+  ([object]
+     (catch-s3-errors
+      (IOUtils/toString (get-object-stream object) "UTF-8")))
+  ([bucket-name object-key]
+     (catch-s3-errors
+      (IOUtils/toString (get-object-stream bucket-name object-key) "UTF-8"))))
 
 (defn put-object-stream [bucket-name object-key stream metadata]
   (catch-s3-errors
