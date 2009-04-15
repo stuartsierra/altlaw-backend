@@ -64,12 +64,14 @@
 (defn get-object [bucket-name object-key]
   (.getObject (get-s3) (get-bucket bucket-name) object-key))
 
-(defn get-object-meta [bucket-name object-key]
-  (catch-s3-errors
-   (into {} (.getMetadataMap
-             (.getObjectDetails (get-s3) (get-bucket bucket-name)
-                                object-key)))))
-
+(defn get-object-meta
+  ([object]
+     (catch-s3-errors (into {} (.getMetadataMap object))))
+  ([bucket-name object-key]
+     (catch-s3-errors
+      (into {} (.getMetadataMap
+                (.getObjectDetails (get-s3) (get-bucket bucket-name)
+                                   object-key))))))
 (defn get-object-stream
   ([object] 
      (catch-s3-errors
