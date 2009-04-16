@@ -44,16 +44,7 @@
     (log/info "Loading docid map from " path)
     (dosync (ref-set *docid-map* (tsv/load-tsv-map (str path))))))
 
-(defn mapper-map [self #^Text wkey #^BytesWritable wvalue
-            #^OutputCollector output reporter]
-  (let [key (str wkey)
-        value (.get wvalue)
-        size (.getSize wvalue)]
-    (log/debug "Map input: " key " => <" size " bytes>")
-    (doseq [[key value] (my-map key value size)]
-      (log/debug "Map OUTPUT: " key " => "(log/logstr value))
-      (.collect output (Text. (pr-str key))
-                (Text. (pr-str value))))))
+(def mapper-map (partial h/byteswritable-map my-map))
 
 (defn tool-run [this args] []
   (let [job (h/default-jobconf this)

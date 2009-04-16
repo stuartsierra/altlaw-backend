@@ -96,6 +96,17 @@
         (.collect output (Text. (pr-str key))
                   (Text. (pr-str value)))))))
 
+(defn byteswritable-map [map-fn self #^Text wkey #^BytesWritable wvalue
+                         #^OutputCollector output reporter]
+  (let [key (str wkey)
+        value (.get wvalue)
+        size (.getSize wvalue)]
+    (log/debug "Map input: " key " => <" size " bytes>")
+    (doseq [[key value] (map-fn key value size)]
+      (log/debug "Map OUTPUT: " key " => "(log/logstr value))
+      (.collect output (Text. (pr-str key))
+                (Text. (pr-str value))))))
+
 (defn standard-reduce [reduce-fn this wkey wvalues-iter output reporter]
   (let [key (read-string (str wkey))
         values (map #(read-string (str %)) (iterator-seq wvalues-iter))]
