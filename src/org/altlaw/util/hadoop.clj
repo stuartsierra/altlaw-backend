@@ -17,6 +17,12 @@
 
 (import-hadoop)
 
+(declare *reporter*)
+
+(defn counter
+  ([name] (.incrCounter *reporter* (name (ns-name *ns*)) name 1))
+  ([group name] (.incrCounter *reporter* group name 1)))
+
 (defn default-jobconf [this]
   (let [conf (.getConf this)
         job (JobConf. conf (.getClass this))]
@@ -27,7 +33,7 @@
     (.setInputFormat job SequenceFileInputFormat)
     (.setOutputFormat job SequenceFileOutputFormat)
     (SequenceFileOutputFormat/setOutputCompressionType job SequenceFile$CompressionType/BLOCK)
-    (.setOutputKeyClass job IntWritable)
+    (.setOutputKeyClass job Text)
     (.setOutputValueClass job Text)
     job))
 
@@ -78,25 +84,25 @@
   [stage corpus]
   (str (job-path stage corpus) "/docids.tsv.gz"))
 
-(defn standard-map [this wkey wvalue output reporter]
+(defn standard-map [map-fn this wkey wvalue output reporter]
   (let [key (read-string (str wkey))
         value (read-string (str wvalue))]
     (log/debug "Mapper input: " (pr-str key)
                " => " (log/logstr value))
     (binding [*reporter* reporter]
-      (doseq [[key value] (my-map key value)]
+      (doseq [[key value] (map-fn key value)]
         (log/debug "Mapper OUTPUT: " (pr-str key)
                    " => " (log/logstr value))
         (.collect output (Text. (pr-str key))
                   (Text. (pr-str value)))))))
 
-(defn standard-reduce [this wkey wvalues-iter output reporter]
+(defn standard-reduce [reduce-fn this wkey wvalues-iter output reporter]
   (let [key (read-string (str wkey))
         values (map #(read-string (str %)) (iterator-seq wvalues-iter))]
     (log/debug "Reducer input: " (pr-str key)
                " => " (log/logstr values))
     (binding [*reporter* reporter]
-      (doseq [[key value] (my-reduce key value)]
+      (doseq [[key value] (reduce-fn key values)]
         (log/debug "Reducer OUTPUT: " (pr-str key)
                    " => " (log/logstr value))
         (.collect output (Text. (pr-str key))
