@@ -1,4 +1,5 @@
-(ns org.altlaw.util.hadoop)
+(ns org.altlaw.util.hadoop
+  (:require [org.altlaw.util.log :as log]))
 
 (defn import-hadoop
   []
@@ -102,29 +103,3 @@
                   (Text. (pr-str value)))))))
 
 
-
-;; (defmulti conf [job key value]
-;;           (fn [job key value] key))
-
-;; (defmethod conf :in [job key value]
-;;   (FileInputFormat/setInputPaths job value))
-
-;; (defmethod conf :out [job key value]
-;;   (FileInputFormat/setOutputPaths job (Path. value)))
-
-;; (defmethod conf :mapper [job key value]
-;;   (.setMapperClass job value))
-
-;; (defmethod conf :reducer [job key value]
-;;   (.setReducerClass job value))
-
-;; (defmethod conf :reducers [job key value]
-;;   (.setNumReduceTasks job value))
-
-;; (defmethod conf :input-format [job key value]
-;;   (.setInputFormat job
-;;                    (cond
-;;                     (= value :seq) SequenceFileInputFormat
-;;                     (= value :text) TextInputFormat
-;;                     (= value :keyval) KeyValueTextInputFormat
-;;                     )))
