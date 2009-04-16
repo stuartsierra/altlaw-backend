@@ -16,7 +16,8 @@ entire case law collection that AltLaw uses, check out
 
 **Thursday, March 19, 2009:** Just a note: the database of cases has
 not yet been updated with new cases from 2009.  We are working on this
-as fast as we can!  Daily updates will be back again within two weeks.
+as fast as we can!  Daily updates will be back again <del>within two
+weeks.</del> soon!
 
 **Monday, March 16, 2009:** The [Advanced Search](/v1/search/advanced)
 feature is back!  Give it a spin, and
