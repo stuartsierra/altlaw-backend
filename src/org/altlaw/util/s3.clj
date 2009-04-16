@@ -86,10 +86,22 @@
 (defn get-object-string 
   ([object]
      (catch-s3-errors
-      (IOUtils/toString (get-object-stream object) "UTF-8")))
+      (with-open [stream (get-object-stream object)]
+        (IOUtils/toString stream "UTF-8"))))
   ([bucket-name object-key]
      (catch-s3-errors
-      (IOUtils/toString (get-object-stream bucket-name object-key) "UTF-8"))))
+      (with-open [stream (get-object-stream bucket-name object-key)]
+        (IOUtils/toString stream "UTF-8")))))
+
+(defn get-object-bytes
+  ([object]
+     (catch-s3-errors
+      (with-open [stream (get-object-stream object)]
+        (IOUtils/toByteArray stream))))
+  ([bucket-name object-key]
+     (catch-s3-errors
+      (with-open [stream (get-object-stream bucket-name object-key)]
+        (IOUtils/toByteArray stream)))))
 
 (defn put-object-stream [bucket-name object-key stream metadata]
   (catch-s3-errors
