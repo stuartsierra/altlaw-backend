@@ -35,8 +35,6 @@
     `(do
        (import-hadoop)
 
-       (def ~'*log* (org.apache.commons.logging.LogFactory/getLog ~the-name))
-
        (gen-class
         :name ~the-name
         :extends org.apache.hadoop.conf.Configured
@@ -78,6 +76,32 @@
   path in which the Docid cache file should be stored."
   [stage corpus]
   (str (job-path stage corpus) "/docids.tsv.gz"))
+
+(defn standard-map [this wkey wvalue output reporter]
+  (let [key (read-string (str wkey))
+        value (read-string (str wvalue))]
+    (log/debug "Mapper input: " (pr-str key)
+               " => " (log/logstr value))
+    (binding [*reporter* reporter]
+      (doseq [[key value] (my-map key value)]
+        (log/debug "Mapper OUTPUT: " (pr-str key)
+                   " => " (log/logstr value))
+        (.collect output (Text. (pr-str key))
+                  (Text. (pr-str value)))))))
+
+(defn standard-reduce [this wkey wvalues-iter output reporter]
+  (let [key (read-string (str wkey))
+        values (map #(read-string (str %)) (iterator-seq wvalues-iter))]
+    (log/debug "Reducer input: " (pr-str key)
+               " => " (log/logstr values))
+    (binding [*reporter* reporter]
+      (doseq [[key value] (my-reduce key value)]
+        (log/debug "Reducer OUTPUT: " (pr-str key)
+                   " => " (log/logstr value))
+        (.collect output (Text. (pr-str key))
+                  (Text. (pr-str value)))))))
+
+
 
 ;; (defmulti conf [job key value]
 ;;           (fn [job key value] key))
