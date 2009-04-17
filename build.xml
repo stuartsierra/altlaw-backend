@@ -33,7 +33,7 @@
   <target name="compile"
           description="Compile all Java sources."
           depends="prepare">
-    <javac destdir="${dir.classes}" debug="true">
+    <javac destdir="${dir.classes}" debug="true" source="6" target="6">
       <src path="${dir.src}"/>
       <exclude name="**/_*.java"/>
       <classpath refid="class.path"/>
