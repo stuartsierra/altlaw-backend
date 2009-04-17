@@ -23,17 +23,17 @@
               meta (PROMetadataReader.)]
           (.setFilename meta filename)
           (.parse meta (StringReader. raw-html))
-          {:docid docid
-           :doctype "case"
-           :files [filename]
-           :name (.getTitle meta)
-           :dockets (vec (.getDockets meta))
-           :citations (vec (.getCitations meta))
-           :court (.getCourtId meta)
-           :date (.getDate meta) 
-           :html body-html
-           :text body-text
-           :size (count body-text)}))
+          [[docid {:docid docid
+                   :doctype "case"
+                   :files [filename]
+                   :name (.getTitle meta)
+                   :dockets (vec (.getDockets meta))
+                   :citations (vec (.getCitations meta))
+                   :court (.getCourtId meta)
+                   :date (.getDate meta) 
+                   :html body-html
+                   :text body-text
+                   :size (count body-text)}]]))
       (do (h/counter "Files with no docid")
           (log/warn "No docid for file " filename)))))
 
