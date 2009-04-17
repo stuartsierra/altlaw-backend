@@ -1,4 +1,4 @@
-(ns org.altlaw.jobs.distindex
+(ns org.altlaw.jobs.post.distindex
    (:require [org.altlaw.util.solr :as solr]
              [org.altlaw.util.hadoop :as hadoop]
              [org.altlaw.util.zip :as zip])
@@ -8,17 +8,17 @@
 
 (hadoop/import-hadoop)
 
-(def *log* (LogFactory/getLog "org.altlaw.jobs.distindex"))
+(def *log* (LogFactory/getLog "org.altlaw.jobs.post.distindex"))
 
 (gen-class
- :name "org.altlaw.jobs.distindex"
+ :name "org.altlaw.jobs.post.distindex"
  :extends org.apache.hadoop.conf.Configured
  :implements [org.apache.hadoop.util.Tool]
  :prefix "tool-"
  :main true)
 
 (gen-class
- :name "org.altlaw.jobs.distindex_mapper"
+ :name "org.altlaw.jobs.post.distindex_mapper"
  :extends org.apache.hadoop.mapred.MapReduceBase
  :implements [org.apache.hadoop.mapred.Mapper]
  :prefix "mapper-"
@@ -123,7 +123,7 @@
     (.delete (FileSystem/get job) outpath true)
 
     (.setMapperClass
-     job (Class/forName "org.altlaw.jobs.distindex_mapper"))
+     job (Class/forName "org.altlaw.jobs.post.distindex_mapper"))
     (.setReducerClass job LongSumReducer)
     (.setOutputKeyClass job Text)
     (.setOutputValueClass job LongWritable)
@@ -138,7 +138,7 @@
 (defn tool-main [& args]
   (System/exit
    (ToolRunner/run (Configuration. )
-                   (.newInstance (Class/forName "org.altlaw.jobs.distindex"))
+                   (.newInstance (Class/forName "org.altlaw.jobs.post.distindex"))
                    (into-array String args))))
 
 

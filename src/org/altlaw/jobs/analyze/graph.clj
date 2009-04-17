@@ -1,4 +1,4 @@
-(ns org.altlaw.jobs.graph
+(ns org.altlaw.jobs.analyze.graph
   (:refer clojure.set)
   (:require [org.altlaw.util.hadoop :as h]
             [org.altlaw.util.log :as log]))
@@ -72,7 +72,7 @@
                                             "," (h/job-path :procfiles :ohm1)))
     (FileOutputFormat/setOutputPath job outpath)
     (.delete hdfs outpath true)
-    (.setMapperClass job org.altlaw.jobs.graph_mapper)
-    (.setReducerClass job org.altlaw.jobs.graph_reducer)
+    (.setMapperClass job org.altlaw.jobs.analyze.graph_mapper)
+    (.setReducerClass job org.altlaw.jobs.analyze.graph_reducer)
     (JobClient/runJob job))
   0)

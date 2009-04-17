@@ -1,4 +1,4 @@
-(ns org.altlaw.jobs.procfiles.profed
+(ns org.altlaw.jobs.pre.profed
   (:require [org.altlaw.util.hadoop :as h]
             [org.altlaw.util.tsv :as tsv]
             [org.altlaw.util.log :as log])
@@ -48,13 +48,13 @@
 
 (defn tool-run [this args] []
   (let [job (h/default-jobconf this)
-        outpath (Path. (h/job-path :procfiles :profed))
+        outpath (Path. (h/job-path :pre :profed))
         hdfs (FileSystem/get job)]
-    (.setJobName job "procfiles.profed")
+    (.setJobName job "pre.profed")
     (FileInputFormat/setInputPaths job (str (h/job-path :seqfiles :profed) "/*.seq"))
     (FileOutputFormat/setOutputPath job outpath)
     (.delete hdfs outpath true)
-    (.setMapperClass job (Class/forName "org.altlaw.jobs.procfiles.profed_mapper"))
+    (.setMapperClass job (Class/forName "org.altlaw.jobs.pre.profed_mapper"))
     (.setNumReduceTasks job 0)
     (DistributedCache/addCacheFile (URI. (h/docid-path :seqfiles :profed)) job)
     (JobClient/runJob job))

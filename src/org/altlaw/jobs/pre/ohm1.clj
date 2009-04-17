@@ -1,4 +1,4 @@
-(ns org.altlaw.jobs.procfiles.ohm1
+(ns org.altlaw.jobs.pre.ohm1
   (:use org.altlaw.extract.ohm1-utils)
   (:refer clojure.set)
   (:require [org.altlaw.util.hadoop :as h]
@@ -104,14 +104,14 @@
 
 (defn tool-run [this args] []
   (let [job (h/default-jobconf this)
-        outpath (Path. (h/job-path :procfiles :ohm1))
+        outpath (Path. (h/job-path :pre :ohm1))
         hdfs (FileSystem/get job)]
-    (.setJobName job "procfiles.ohm1")
+    (.setJobName job "pre.ohm1")
     (FileInputFormat/setInputPaths job (str (h/job-path :seqfiles :ohm1) "/*.seq"))
     (FileOutputFormat/setOutputPath job outpath)
     (.delete hdfs outpath true)
-    (.setMapperClass job (Class/forName "org.altlaw.jobs.procfiles.ohm1_mapper"))
-    (.setReducerClass job (Class/forName "org.altlaw.jobs.procfiles.ohm1_reducer"))
+    (.setMapperClass job (Class/forName "org.altlaw.jobs.pre.ohm1_mapper"))
+    (.setReducerClass job (Class/forName "org.altlaw.jobs.pre.ohm1_reducer"))
     (DistributedCache/addCacheFile (URI. (h/docid-path :seqfiles :ohm1)) job)
     (JobClient/runJob job))
   0)
