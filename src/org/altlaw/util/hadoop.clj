@@ -20,8 +20,10 @@
 (declare *reporter*)
 
 (defn counter
-  ([name] (.incrCounter *reporter* (name (ns-name *ns*)) name 1))
-  ([group name] (.incrCounter *reporter* group name 1)))
+  ([counter-name]
+     (.incrCounter *reporter* "Custom counters" counter-name 1))
+  ([group counter-name]
+     (.incrCounter *reporter* group counter-name 1)))
 
 (defn default-jobconf [this]
   (let [conf (.getConf this)
