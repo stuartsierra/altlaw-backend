@@ -90,12 +90,12 @@
 
 ;;; REDUCER
 
-(defn my-reduce [docid docs]
+(defn my-reduce [docid-set docs]
   (let [doc (reduce merge/singleize {} (apply merge-with union docs))]
     (if (and (:html doc) (:text doc))
-      [[docid doc]]
+      [[(:docid doc) doc]]
       (do (h/counter "No html/text")
-          (log/warn "No html/text; skipping " docid)))))
+          (log/warn "No html/text; skipping " (:docid doc))))))
 
 (def reducer-reduce (partial h/standard-reduce my-reduce))
 
