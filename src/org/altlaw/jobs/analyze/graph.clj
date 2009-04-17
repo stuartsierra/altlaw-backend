@@ -65,11 +65,11 @@
 
 (defn tool-run [this args] []
   (let [job (h/default-jobconf this)
-        outpath (Path. (h/job-path :graph))
+        outpath (Path. (h/job-path :analyze :graph))
         hdfs (FileSystem/get job)]
     (.setJobName job "graph")
-    (FileInputFormat/setInputPaths job (str (h/job-path :procfiles :profed)
-                                            "," (h/job-path :procfiles :ohm1)))
+    (FileInputFormat/setInputPaths job (str (h/job-path :pre :profed)
+                                            "," (h/job-path :pre :ohm1)))
     (FileOutputFormat/setOutputPath job outpath)
     (.delete hdfs outpath true)
     (.setMapperClass job org.altlaw.jobs.analyze.graph_mapper)

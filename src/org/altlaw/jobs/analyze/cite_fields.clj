@@ -22,10 +22,10 @@
 
 (defn tool-run [this args] []
   (let [job (h/default-jobconf this)
-        outpath (Path. (h/job-path :cite_fields))
+        outpath (Path. (h/job-path :analyze :cite_fields))
         hdfs (FileSystem/get job)]
     (.setJobName job "cite_fields")
-    (FileInputFormat/setInputPaths job (str (h/job-path :graph)))
+    (FileInputFormat/setInputPaths job (str (h/job-path :analyze :graph)))
     (FileOutputFormat/setOutputPath job outpath)
     (.delete hdfs outpath true)
     (.setMapperClass job org.altlaw.jobs.analyze.cite_fields_mapper)
