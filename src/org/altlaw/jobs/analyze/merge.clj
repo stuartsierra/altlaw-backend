@@ -2,13 +2,18 @@
   (:refer clojure.set)
   (:require [org.altlaw.util.hadoop :as h]
             [org.altlaw.util.log :as log]
+            [org.altlaw.db.privacy :as priv]
             [org.altlaw.util.merge-fields :as merge]))
 
 (h/setup-mapreduce)
 
 
 (defn my-reduce [docid documents]
-  [[docid (merge/merge-fields documents)]])
+  (if (priv/removed? docid)
+    (do (h/counter "Removed documents")
+        (log/info "Skipping removed document " docid)
+        nil)
+    [[docid (merge/merge-fields documents)]]))
 
 ;;; METHOD IMPLEMENTATIONS
 
