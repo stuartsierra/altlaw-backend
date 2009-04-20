@@ -7,14 +7,15 @@
   (re-seq *citation-regex* text))
 
 (defn link-citations [html]
-  (let [buffer (StringBuffer.)
-        matcher (re-matcher *citation-regex* html)]
-    (loop []
-      (if (.find matcher)
-        (let [cite (.group matcher)
-              link (str "<a class=\"cite\" href=\"/cite/" (URLEncoder/encode cite)
-                        "\">" cite "</a>")]
-          (.appendReplacement matcher buffer link)
-          (recur))
-        (do (.appendTail matcher buffer)
-            (str buffer))))))
+  (when html
+    (let [buffer (StringBuffer.)
+          matcher (re-matcher *citation-regex* html)]
+      (loop []
+        (if (.find matcher)
+          (let [cite (.group matcher)
+                link (str "<a class=\"cite\" href=\"/cite/" (URLEncoder/encode cite)
+                          "\">" cite "</a>")]
+            (.appendReplacement matcher buffer link)
+            (recur))
+          (do (.appendTail matcher buffer)
+              (str buffer)))))))
