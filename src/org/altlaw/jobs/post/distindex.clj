@@ -53,7 +53,8 @@
 
 (defn prepare-solr-document [data]
   (assoc (select-keys data [:docid :doctype :name :citations
-                            :court :text :size :date])
+                            :court :text :size :date
+                            :incites :outcites])
     :html_content_sha1 (DigestUtils/shaHex (:html data))))
 
 (defn index-document [server doc]
