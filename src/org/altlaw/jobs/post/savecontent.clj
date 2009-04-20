@@ -1,4 +1,4 @@
-(ns org.altlaw.jobs.savecontent
+(ns org.altlaw.jobs.post.savecontent
   (:require [org.altlaw.util.hadoop :as h]
             [org.altlaw.util.log :as log]
             [org.altlaw.util.context :as context]
@@ -15,6 +15,9 @@
     (do (h/counter "No HTML")
         (log/warn "No HTML for docid " docid)
         nil)))
+
+(defn mapper-configure [this jobconf]
+  (context/use-hadoop-jobconf jobconf))
 
 (def mapper-map (partial h/standard-map my-map))
 
