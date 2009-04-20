@@ -56,7 +56,7 @@
   ([bucket-name]
      (.listObjects (get-s3) (get-bucket bucket-name)))
   ([bucket-name prefix]
-     (.listObjects (get-s3) (get-bucket bucket-name) nil)))
+     (.listObjects (get-s3) (get-bucket bucket-name) prefix nil)))
 
 (defn delete-object [bucket-name object-key]
   (catch-s3-errors (.deleteObject (get-s3) bucket-name object-key)))
