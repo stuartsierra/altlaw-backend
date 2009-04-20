@@ -6,6 +6,9 @@
 (defn use-property-function [f]
   (alter-var-root #'get-property-function (fn [_] f)))
 
+(defn use-hadoop-jobconf [jobconf]
+  (use-property-function (fn [name] (.get jobconf name))))
+
 (defn get-property [name]
   (or (get-property-function name)
       (throw (Exception. (str "Missing property " name)))))
