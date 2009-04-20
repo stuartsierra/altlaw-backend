@@ -16,8 +16,8 @@
         lines (duck/read-lines (.open fs (Path. "/v4/distindex/part-00000")))
         files (map #(first (.split % "\t")) lines)
         zipfiles (map #(str "/v4/distindex/" %) files)
-        unzipdirs (map #(str "/mnt/mergeindex/" (.replace % ".zip" "")) files)]
-    (println "Unpacking indexed ZIP files...")
+        unzipdirs (map #(str "/mnt/distindexes/" (.replace % ".zip" "")) files)]
+    (println "Unpacking distindex ZIP files to /mnt/distindexes/...")
     (doseq [[zipfile unzipdir] (map vector zipfiles unzipdirs)]
       (println zipfile)
       (with-open [stream (.open fs (Path. zipfile))]
