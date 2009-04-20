@@ -21,9 +21,9 @@
 
 (defn counter
   ([counter-name]
-     (.incrCounter *reporter* "Custom counters" counter-name 1))
+     (.incrCounter *reporter* "Custom counters" (str counter-name) 1))
   ([group counter-name]
-     (.incrCounter *reporter* group counter-name 1)))
+     (.incrCounter *reporter* (str group) (str counter-name) 1)))
 
 (defn default-jobconf [this]
   (let [conf (.getConf this)
