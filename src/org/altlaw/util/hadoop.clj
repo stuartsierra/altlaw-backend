@@ -1,4 +1,5 @@
-(ns org.altlaw.util.hadoop)
+(ns org.altlaw.util.hadoop
+  (:require [org.altlaw.util.log :as log]))
 
 (defn import-hadoop
   []
@@ -16,6 +17,14 @@
 
 (import-hadoop)
 
+(declare *reporter*)
+
+(defn counter
+  ([counter-name]
+     (.incrCounter *reporter* "Custom counters" counter-name 1))
+  ([group counter-name]
+     (.incrCounter *reporter* group counter-name 1)))
+
 (defn default-jobconf [this]
   (let [conf (.getConf this)
         job (JobConf. conf (.getClass this))]
@@ -26,7 +35,7 @@
     (.setInputFormat job SequenceFileInputFormat)
     (.setOutputFormat job SequenceFileOutputFormat)
     (SequenceFileOutputFormat/setOutputCompressionType job SequenceFile$CompressionType/BLOCK)
-    (.setOutputKeyClass job IntWritable)
+    (.setOutputKeyClass job Text)
     (.setOutputValueClass job Text)
     job))
 
@@ -34,8 +43,6 @@
   (let [the-name (str (name (ns-name *ns*)))]
     `(do
        (import-hadoop)
-
-       (def ~'*log* (org.apache.commons.logging.LogFactory/getLog ~the-name))
 
        (gen-class
         :name ~the-name
@@ -79,28 +86,40 @@
   [stage corpus]
   (str (job-path stage corpus) "/docids.tsv.gz"))
 
-;; (defmulti conf [job key value]
-;;           (fn [job key value] key))
+(defn standard-map [map-fn this wkey wvalue output reporter]
+  (let [key (read-string (str wkey))
+        value (read-string (str wvalue))]
+    (log/debug "Mapper input: " (pr-str key)
+               " => " (log/logstr value))
+    (binding [*reporter* reporter]
+      (doseq [[key value] (map-fn key value)]
+        (log/debug "Mapper OUTPUT: " (pr-str key)
+                   " => " (log/logstr value))
+        (.collect output (Text. (pr-str key))
+                  (Text. (pr-str value)))))))
 
-;; (defmethod conf :in [job key value]
-;;   (FileInputFormat/setInputPaths job value))
+(defn byteswritable-map [map-fn self #^Text wkey #^BytesWritable wvalue
+                         #^OutputCollector output reporter]
+  (let [key (str wkey)
+        value (.get wvalue)
+        size (.getSize wvalue)]
+    (log/debug "Map input: " key " => <" size " bytes>")
+    (binding [*reporter* reporter]
+      (doseq [[key value] (map-fn key value size)]
+        (log/debug "Map OUTPUT: " key " => "(log/logstr value))
+        (.collect output (Text. (pr-str key))
+                  (Text. (pr-str value)))))))
 
-;; (defmethod conf :out [job key value]
-;;   (FileInputFormat/setOutputPaths job (Path. value)))
+(defn standard-reduce [reduce-fn this wkey wvalues-iter output reporter]
+  (let [key (read-string (str wkey))
+        values (map #(read-string (str %)) (iterator-seq wvalues-iter))]
+    (log/debug "Reducer input: " (pr-str key)
+               " => " (log/logstr values))
+    (binding [*reporter* reporter]
+      (doseq [[key value] (reduce-fn key values)]
+        (log/debug "Reducer OUTPUT: " (pr-str key)
+                   " => " (log/logstr value))
+        (.collect output (Text. (pr-str key))
+                  (Text. (pr-str value)))))))
 
-;; (defmethod conf :mapper [job key value]
-;;   (.setMapperClass job value))
 
-;; (defmethod conf :reducer [job key value]
-;;   (.setReducerClass job value))
-
-;; (defmethod conf :reducers [job key value]
-;;   (.setNumReduceTasks job value))
-
-;; (defmethod conf :input-format [job key value]
-;;   (.setInputFormat job
-;;                    (cond
-;;                     (= value :seq) SequenceFileInputFormat
-;;                     (= value :text) TextInputFormat
-;;                     (= value :keyval) KeyValueTextInputFormat
-;;                     )))

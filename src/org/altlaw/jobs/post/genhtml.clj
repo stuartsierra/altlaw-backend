@@ -1,4 +1,4 @@
-(ns org.altlaw.jobs.genhtml
+(ns org.altlaw.jobs.post.genhtml
   (:require [org.altlaw.util.hadoop :as hadoop]
             [org.altlaw.util.log :as log]
             [org.altlaw.util.context :as context]
@@ -28,7 +28,7 @@
     (.delete hdfs outpath true)
 
     (.setMapperClass job (Class/forName
-                          "org.altlaw.jobs.genhtml_mapper"))
+                          "org.altlaw.jobs.post.genhtml_mapper"))
     (.setNumReduceTasks job 0)
 
     (.setOutputKeyClass job Text)

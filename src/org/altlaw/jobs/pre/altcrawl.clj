@@ -1,4 +1,4 @@
-(ns org.altlaw.jobs.procfiles.altcrawl
+(ns org.altlaw.jobs.pre.altcrawl
   (:require [org.altlaw.util.hadoop :as hadoop]
             [clojure.contrib.walk :as walk])
   (:use clojure.contrib.json.read
@@ -71,15 +71,15 @@
 
 (defn tool-run [this args]
   (let [job (hadoop/default-jobconf this)
-        outpath (Path. (hadoop/job-path :procfiles :altcrawl))
+        outpath (Path. (hadoop/job-path :pre :altcrawl))
         hdfs (FileSystem/get job)]
-    (.setJobName job "procfiles.altcrawl")
+    (.setJobName job "pre.altcrawl")
     (FileInputFormat/setInputPaths job (str (hadoop/job-path :seqfiles :altcrawl) "/*.jsr"))
     (FileOutputFormat/setOutputPath job outpath)
     (.setInputFormat job TextInputFormat)
     (.delete hdfs outpath true)
-    (.setMapperClass job (Class/forName "org.altlaw.jobs.procfiles.altcrawl_mapper"))
-    (.setReducerClass job (Class/forName "org.altlaw.jobs.procfiles.altcrawl_reducer"))
+    (.setMapperClass job (Class/forName "org.altlaw.jobs.pre.altcrawl_mapper"))
+    (.setReducerClass job (Class/forName "org.altlaw.jobs.pre.altcrawl_reducer"))
     (.setMapOutputKeyClass job Text)
     (JobClient/runJob job))
   0)

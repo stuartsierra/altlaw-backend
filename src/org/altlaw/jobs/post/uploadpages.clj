@@ -1,4 +1,4 @@
-(ns org.altlaw.jobs.uploadpages
+(ns org.altlaw.jobs.post.uploadpages
   (:require [org.altlaw.util.hadoop :as hadoop]
             [org.altlaw.util.log :as log]
             [org.altlaw.util.context :as context]
@@ -19,7 +19,7 @@
   (content/put-page-bytes (str wkey) 
                           (Arrays/copyOf (.get wvalue) (.getSize wvalue))
                           "text/html")
-  (.incrCounter reporter "org.altlaw.jobs.uploadpages" "Uploaded objects" 1)
+  (.incrCounter reporter "org.altlaw.jobs.post.uploadpages" "Uploaded objects" 1)
   (.collect output wkey *empty-bytes*))
 
 (defn tool-run [this args]
@@ -33,7 +33,7 @@
     (.delete hdfs outpath true)
 
     (.setMapperClass job (Class/forName
-                          "org.altlaw.jobs.uploadpages_mapper"))
+                          "org.altlaw.jobs.post.uploadpages_mapper"))
     (.setNumReduceTasks job 0)
 
     (.setOutputKeyClass job Text)

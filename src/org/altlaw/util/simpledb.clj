@@ -1,4 +1,6 @@
 (ns org.altlaw.util.simpledb
+  (:require [org.altlaw.util.context :as context]
+            [clojure.contrib.singleton :as sing])
   (:import (com.xerox.amazonws.sdb SimpleDB ItemAttribute)
            (java.util ArrayList)))
 
@@ -35,13 +37,15 @@
 
 (def #^{:doc "Returns the (cached) SimpleDB object."}
      get-simpledb
-     (memoize (fn []
-                (SimpleDB. (System/getenv "AWS_ACCESS_KEY_ID")
-                           (System/getenv "AWS_SECRET_ACCESS_KEY")))))
+     (sing/per-thread-singleton
+      (fn []
+        (SimpleDB. (context/aws-access-key-id)
+                   (context/aws-secret-access-key)))))
 
 (def #^{:doc "Returns the (cached) SimpleDB Domain object for name."}
      get-domain
-     (memoize (fn [name] (.getDomain (get-simpledb) (keystr name)))))
+     (memoize
+      (fn [name] (.getDomain (get-simpledb) (keystr name)))))
 
 (defn- get-item
   "Returns the SimpleDB item object with the given name in the

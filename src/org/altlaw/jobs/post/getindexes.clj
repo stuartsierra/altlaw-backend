@@ -1,4 +1,4 @@
-(ns org.altlaw.jobs.getindexes
+(ns org.altlaw.jobs.post.getindexes
   (:require [org.altlaw.util.hadoop :as hadoop]
             [org.altlaw.util.zip :as zip]
             [clojure.contrib.duck-streams :as duck])
@@ -28,5 +28,5 @@
   (System/exit
    (org.apache.hadoop.util.ToolRunner/run 
     (Configuration.)
-    (.newInstance (Class/forName "org.altlaw.jobs.getindexes"))
+    (.newInstance (Class/forName "org.altlaw.jobs.post.getindexes"))
     (into-array String args))))
