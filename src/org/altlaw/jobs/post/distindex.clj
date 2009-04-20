@@ -34,11 +34,6 @@
 
 ;;; MAPPER STARTUP
 
-(defn mapper-init
-  "Constructor, passes all args to superclass constructor and
-  initializes state to a ref of a map."
-  [& args] [(vec args) (ref {})])
-
 
 (defn mapper-configure
   "configure method of the Mapper.  Gets the necessary details out of
