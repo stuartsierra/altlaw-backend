@@ -17,7 +17,9 @@
                     (= :html k) v
                     (= :date k) (date/format-long-date v)
                     (= :court k) (courts/*court-names* v)
-                    (#{:name} k) (tmpl/h v)
+                    (= :name k) (if (or (nil? v) (empty? v))
+                                  (str "Untitled #" (:docid doc))
+                                  (tmpl/h v))
                     (#{:citations :dockets} k) (map tmpl/h v)
                     :else v)))
           {} doc))
