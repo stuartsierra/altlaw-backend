@@ -13,6 +13,9 @@
 (defn get-page [path]
   (s3/get-object-string *bucket* (str "www/" path)))
 
+
+;;; Content objects, identified by SHA1 hash
+
 (defn put-content-string [content metadata]
   (let [hash (DigestUtils/shaHex content)
         key (str "sha1/" hash)]
