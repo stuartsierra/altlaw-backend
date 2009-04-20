@@ -4,7 +4,8 @@
              [org.altlaw.util.log :as log]
              [org.altlaw.util.hadoop :as h])
   (:import (org.apache.commons.io FileUtils)
-           (java.io File)))
+           (java.io File)
+           (org.apache.commons.codec.digest DigestUtils)))
 
 (h/setup-mapreduce)
 
@@ -34,11 +35,6 @@
 
 ;;; MAPPER STARTUP
 
-(defn mapper-init
-  "Constructor, passes all args to superclass constructor and
-  initializes state to a ref of a map."
-  [& args] [(vec args) (ref {})])
-
 
 (defn mapper-configure
   "configure method of the Mapper.  Gets the necessary details out of
@@ -56,8 +52,9 @@
 ;;; MAPPER RUN
 
 (defn prepare-solr-document [data]
-  (select-keys data [:docid :doctype :name :citations
-                     :court :text :size :date]))
+  (assoc (select-keys data [:docid :doctype :name :citations
+                            :court :text :size :date])
+    :html_content_sha1 (DigestUtils/shaHex (:html data))))
 
 (defn index-document [server doc]
   (.add server (solr/make-solr-document (prepare-solr-document doc))))

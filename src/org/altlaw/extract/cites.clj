@@ -12,7 +12,7 @@
     (loop []
       (if (.find matcher)
         (let [cite (.group matcher)
-              link (str "<a href=\"/cite/" (URLEncoder/encode cite)
+              link (str "<a class=\"cite\" href=\"/cite/" (URLEncoder/encode cite)
                         "\">" cite "</a>")]
           (.appendReplacement matcher buffer link)
           (recur))

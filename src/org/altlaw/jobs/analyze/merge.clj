@@ -2,15 +2,27 @@
   (:refer clojure.set)
   (:require [org.altlaw.util.hadoop :as h]
             [org.altlaw.util.log :as log]
+            [org.altlaw.util.context :as context]
+            [org.altlaw.db.privacy :as priv]
+            [org.altlaw.extract.cites :as cites]
             [org.altlaw.util.merge-fields :as merge]))
 
 (h/setup-mapreduce)
 
 
 (defn my-reduce [docid documents]
-  [[docid (merge/merge-fields documents)]])
+  (if (priv/removed? docid)
+    (do (h/counter "Removed documents")
+        (log/info "Skipping removed document " docid)
+        nil)
+    (let [merged-doc (merge/merge-fields documents)
+          linked-html (cites/link-citations (:html merged-doc))]
+      [[docid (assoc merged-doc :html linked-html)]])))
 
 ;;; METHOD IMPLEMENTATIONS
+
+(defn reducer-configure [this jobconf]
+  (context/use-hadoop-jobconf jobconf))
 
 (def reducer-reduce (partial h/standard-reduce my-reduce))
 

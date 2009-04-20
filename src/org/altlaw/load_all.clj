@@ -6,6 +6,7 @@
    org.altlaw.jobs.analyze.cite_fields
    org.altlaw.jobs.analyze.merge
    org.altlaw.jobs.post.distindex
+   org.altlaw.jobs.post.savecontent
 
    org.altlaw.test.run
    org.altlaw.test.www
