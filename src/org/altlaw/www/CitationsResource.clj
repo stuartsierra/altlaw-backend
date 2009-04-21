@@ -31,13 +31,13 @@
   (doto (SolrQuery. (str "incites:" docid))
     (.setQueryType "standard")
     (.setFields *cite-fields*)
-    (.setNumRows 100)))
+    (.setRows 100)))
 
 (defn get-outcites-query [docid]
   (doto (SolrQuery. (str "outcites:" docid))
     (.setQueryType "standard")
     (.setFields *cite-fields*)
-    (.setNumRows 100)))
+    (.setRows 100)))
 
 (defn get-displayed-document
   "Searches Solr for the document with the given docid.
@@ -76,7 +76,6 @@
    :date (.getFieldValue doc "date")
    :court (.getFieldValue doc "court")
    :citations (.getFieldValues doc "citations")
-   :html (content/get-content-string (.getFieldValue doc "html_content_sha1"))
    :incites (map prepare-cite-document outcite-docs)
    :outcites (map prepare-cite-document incite-docs)})
 
@@ -85,8 +84,9 @@
 (defmethod represent MediaType/TEXT_HTML [docid media-type]
   (StringRepresentation.
    (pages/gen-case-page
-    :citations (let [[incites outcites] (get-cite-documents)]
-                 (prepare-html-document (get-document docid) incites outcites)))
+    :citations (let [[incites outcites] (get-cite-documents docid)]
+                 (prepare-displayed-document (get-displayed-document docid)
+                                             incites outcites)))
    MediaType/TEXT_HTML
    Language/ENGLISH_US
    CharacterSet/UTF_8))
