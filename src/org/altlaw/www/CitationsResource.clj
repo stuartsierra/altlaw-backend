@@ -14,18 +14,32 @@
 
 (declare *solr*)
 
-(def *default-fields*
+(def *display-fields*
      (into-array ["doctype" "docid" "name" "citations"
                   "date" "court" "size"]))
+
+(def *cite-fields*
+     (into-array ["doctype" "docid" "name" "citations"
+                  "date" "court"]))
 
 (defn get-document-query [docid]
   (doto (SolrQuery. (str "docid:" docid))
     (.setQueryType "standard")
     (.setFields *display-fields*)))
 
-(defn execute-search [query])
+(defn get-incites-query [docid]
+  (doto (SolrQuery. (str "incites:" docid))
+    (.setQueryType "standard")
+    (.setFields *cite-fields*)
+    (.setNumRows 100)))
 
-(defn get-document
+(defn get-outcites-query [docid]
+  (doto (SolrQuery. (str "outcites:" docid))
+    (.setQueryType "standard")
+    (.setFields *cite-fields*)
+    (.setNumRows 100)))
+
+(defn get-displayed-document
   "Searches Solr for the document with the given docid.
   Returns a SolrDocument.
   Throws ResourceException 404 if not found, or 410 if removed."
@@ -38,23 +52,41 @@
         (throw (ResourceException. Status/CLIENT_ERROR_NOT_FOUND))
         (first results)))))
 
-(defn prepare-html-document
-  "Given a SolrDocument, returns a document map suitable 
-  for use by case-pages/gen-case-page"
+(defn get-cite-documents
+  "Searches Solr for the documents citing/cited by the given docid.
+  Returns a vector pair of SolrDocumentList objects; incites and outcites."
+  [docid]
+  [(.getResults (.query *solr* (get-incites-query docid)))
+   (.getResults (.query *solr* (get-outcites-query docid)))])
+
+(defn prepare-cite-document
   [doc]
   {:docid (.getFieldValue doc "docid")
    :name (.getFieldValue doc "name")
    :date (.getFieldValue doc "date")
    :court (.getFieldValue doc "court")
+   :citations (.getFieldValues doc "citations")})
+
+(defn prepare-displayed-document
+  "Given a SolrDocument, returns a document map suitable 
+  for use by case-pages/gen-case-page"
+  [doc incite-docs outcite-docs]
+  {:docid (.getFieldValue doc "docid")
+   :name (.getFieldValue doc "name")
+   :date (.getFieldValue doc "date")
+   :court (.getFieldValue doc "court")
    :citations (.getFieldValues doc "citations")
-   :html (content/get-content-string (.getFieldValue doc "html_content_sha1"))})
+   :html (content/get-content-string (.getFieldValue doc "html_content_sha1"))
+   :incites (map prepare-cite-document outcite-docs)
+   :outcites (map prepare-cite-document incite-docs)})
 
 (defmulti represent (fn [docid media-type] media-type))
 
 (defmethod represent MediaType/TEXT_HTML [docid media-type]
   (StringRepresentation.
    (pages/gen-case-page
-    :text (prepare-html-document (get-document docid)))
+    :citations (let [[incites outcites] (get-cite-documents)]
+                 (prepare-html-document (get-document docid) incites outcites)))
    MediaType/TEXT_HTML
    Language/ENGLISH_US
    CharacterSet/UTF_8))
