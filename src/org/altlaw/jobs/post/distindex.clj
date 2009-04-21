@@ -61,8 +61,13 @@
   (.add server (solr/make-solr-document (prepare-solr-document doc))))
 
 (defn my-map [docid document]
-  (index-document (:server @*config*) document)
-  [[(:zip-file-name @*config*) 1]])
+  (if (empty? (:html document))  ;; or nil, (empty? nil) is true
+    (do (h/counter "No HTML")
+        (log/warn "No HTML for document " docid)
+        nil)
+    (do (h/counter "Indexed documents")
+        (index-document (:server @*config*) document)
+        [[(:zip-file-name @*config*) 1]])))
 
 (def mapper-map (partial h/standard-map my-map))
 
