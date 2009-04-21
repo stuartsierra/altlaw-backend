@@ -23,8 +23,6 @@
     (.setQueryType "standard")
     (.setFields *display-fields*)))
 
-(defn execute-search [query])
-
 (defn get-document
   "Searches Solr for the document with the given docid.
   Returns a SolrDocument.
