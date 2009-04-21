@@ -30,6 +30,7 @@ CP="$CP:$ALTLAW_HOME/build/classes"
 CP="$CP:$ALTLAW_HOME/build/clj_classes"
 CP="$CP:$ALTLAW_HOME/lib/*"
 
+JAVA_OPTS="$JAVA_OPTS -server"
 JAVA_OPTS="$JAVA_OPTS -XX:+UseConcMarkSweepGC -Xmx1024m"
 JAVA_OPTS="$JAVA_OPTS -Dclojure.compile.path=$ALTLAW_HOME/build/clj_classes"
 JAVA_OPTS="$JAVA_OPTS -Dorg.altlaw.home=$ALTLAW_HOME"
