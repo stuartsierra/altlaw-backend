@@ -7,6 +7,7 @@
             org.altlaw.www.CiteFinder
             org.altlaw.www.AllCasesFinder
             org.altlaw.www.SearchResource
+            org.altlaw.www.CitationsResource
             org.altlaw.www.DocResource
             org.altlaw.www.content-pages
             [org.altlaw.util.context :as context]
@@ -41,5 +42,6 @@
       (.attach "/v1/cases" (new org.altlaw.www.AllCasesFinder context))
       (.attach "/v1/search/{query_type}" org.altlaw.www.SearchResource)
       (.attach "/v1/search" org.altlaw.www.SearchResource)
+      (.attach "/v1/cases/{docid}/citations" org.altlaw.www.CitationsResource)
       (.attach "/v1/cases/{docid}" org.altlaw.www.DocResource)
       (.attach static-finder))))
