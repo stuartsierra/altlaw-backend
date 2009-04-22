@@ -5,6 +5,13 @@
 Welcome to the new **AltLaw**.  We're pleased to announce that the
 search engine is once again fully functional.
 
+**Wednesday, April 22, 2009:** New feature - Linked citations in case
+texts!  [See an example](/v1/cases/404112).
+
+**Did you know?** You can also link directly to a citation with a URL
+like <nobr><http://www.altlaw.org/cite/101+U.S.+99></nobr> (just
+replace the spaces in the cite with `+` signs).
+
 **Monday, March 30, 2009:** Having trouble finding the list of cases
 cited by / citing to each case?  They're still there -- click on the
 **"Citations to/from this"** link to the right of a case, and you'll
