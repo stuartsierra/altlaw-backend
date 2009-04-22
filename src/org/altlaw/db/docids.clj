@@ -10,9 +10,6 @@
 (defn get-docids [collection]
   (data/get-data (str "docids/" collection)))
 
-(defn save-docids [collection]
-  (data/save-data (str "docids/" collection)))
-
 (defn get-docid [collection key]
   (get @(get-docids collection) key))
 
@@ -20,11 +17,27 @@
   (assert (coll? keys))
   (assert (every? string? keys))
   (assert (integer? docid))
-  (dosync (apply alter (get-docids collection)
-                 assoc (mapcat list keys (repeat docid)))))
+  (apply alter (get-docids collection)
+         assoc (mapcat list keys (repeat docid))))
 
-(defn get-next-docid []
-  (Integer/parseInt (props/get-property "next_docid")))
+(def get-next-docid
+     (memoize
+      (fn []
+        (ref (Integer/parseInt (props/get-property "next_docid"))))))
 
 (defn set-next-docid [docid]
-  (props/set-property "next_docid" docid))
+  (dosync (ref-set (get-next-docid) docid)))
+
+(defn- increment-next-docid []
+  (alter (get-next-docid) inc))
+
+(defn assign-next-docid [collection keys]
+  (dosync (set-docid collection keys @(get-next-docid))
+          (increment-next-docid)))
+
+(defn save-next-docid []
+  (props/set-property "next_docid" @(get-next-docid)))
+
+(defn save-docids [collection]
+  (data/save-data (str "docids/" collection)))
+
