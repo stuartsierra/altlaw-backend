@@ -13,12 +13,12 @@
   (data/save-data (str "docids/" collection)))
 
 (defn get-docid [collection key]
-  (get @(get-docids collection key)))
+  (get @(get-docids collection) key))
 
 (defn set-docid [collection keys docid]
   (assert (coll? keys))
   (assert (every? string? keys))
   (assert (integer? docid))
   (dosync (apply alter (get-docids collection)
-                 assoc (zipmap keys (repeat docid)))))
+                 assoc (mapcat list keys (repeat docid)))))
 
