@@ -1,5 +1,6 @@
 (ns org.altlaw.db.docids
-  (:require [org.altlaw.db.data :as data]))
+  (:require [org.altlaw.db.data :as data]
+            [org.altlaw.db.properties :as props]))
 
 (def #^{:private true} *bucket* "altlaw.org")
 
@@ -22,3 +23,8 @@
   (dosync (apply alter (get-docids collection)
                  assoc (mapcat list keys (repeat docid)))))
 
+(defn get-next-docid []
+  (Integer/parseInt (props/get-property "next_docid")))
+
+(defn set-next-docid [docid]
+  (props/set-property "next_docid" docid))
