@@ -1,28 +1,43 @@
 (ns org.altlaw.db.download-log
-  (:require [org.altlaw.util.simpledb :as db])
-  (:import (java.util Date)
+  (:require [org.altlaw.db.data :as data])
+  (:import (java.util Date Calendar)
            (org.altlaw.util DateUtils)))
 
-(def #^{:private true} *domain* "DownloadLog")
+(defn get-download-log []
+  (data/get-data "download-log"))
 
-(defn download-date [url]
-  (let [attrs (db/get-attrs *domain* url)]
-    (when-let [date-string (get attrs "download_date")]
-      (DateUtils/parseDateISO8601 date-string))))
+(defn create-download-log []
+  (data/create-data "download-log" {}))
 
-(defn downloaded? [url]
-  (if (download-date url) true false))
+(defn save-download-log []
+  (data/save-data "download-log"))
 
-(defn enqueue-download [url]
-  (db/put-attrs *domain* url
-                {:queue_date (DateUtils/timestamp)}))
+(defn- check-date-format
+  "If date is a Date or Calendar object, convert to an ISO-8601
+  string.  If it is a string, check that it is in ISO-8601 format.
+  Returns an ISO-8601 string or throws exception on bad input."
+  [date]
+  (cond
+   (string? date) (DateUtils/dateToISO8601
+                   (DateUtils/parseDateISO8601 date))
+   (instance? Date date) (DateUtils/dateToISO8601 date)
+   (instance? Calendar date) (DateUtils/calendarToISO8601 date)
+   :else (throw (Exception. "date must be an ISO-8601 String, a Date, or a Calendar"))))
 
-(defn record-download
+(defn log-download
+  "Logs a download of the URL (a String). If date (Date object or
+  ISO-8601 date/time string) is not given, assume current date/time."
   ([url]
-     (db/put-attrs *domain* url
-                   {:download_date (DateUtils/timestamp)}))
-  ([url #^Date date]
-     (db/put-attrs *domain* url
-                   {:download_date
-                    (.format DateUtils/ISO8601_GMT date)})))
+     (assert (string? url))
+     (dosync (alter (get-download-log)
+                    assoc url (DateUtils/timestamp))))
+  ([url date]
+     (assert (string? url))
+     (dosync (alter (get-download-log)
+                    assoc url (check-date-format date)))))
 
+(defn downloaded?
+  "Returns true if the URL (a String) has already been downloaded."
+  [url]
+  (assert (string? url))
+  (contains? @(get-download-log) url))
