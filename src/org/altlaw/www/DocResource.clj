@@ -41,6 +41,7 @@
   for use by case-pages/gen-case-page"
   [doc]
   {:docid (.getFieldValue doc "docid")
+   :doctype (.getFieldValue doc "doctype")
    :name (.getFieldValue doc "name")
    :date (.getFieldValue doc "date")
    :court (.getFieldValue doc "court")
