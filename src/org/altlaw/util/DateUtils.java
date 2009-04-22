@@ -48,6 +48,17 @@ public class DateUtils {
         return RFC2822.format(date);
     }
 
+    /** Converts a Date object to an ISO-8601 date/time string.
+     * Always converts to GMT. */
+    public static String dateToISO8601(Date date) {
+        return ISO8601_GMT.format(date); // guaranteed GMT
+    }
+
+    /** Converts a Date object to an RFC 2822 date/time string. */
+    public static String dateToRFC2822(Date date) {
+        return RFC2822.format(date);
+    }
+
     public static Date parseDateISO8601(String date) throws ParseException {
         return ISO8601_GMT.parse(date);
     }
