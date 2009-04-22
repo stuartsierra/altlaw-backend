@@ -80,7 +80,7 @@ address {font-style: normal;}
  margin: 10px 15px 10px 15px;
  line-height: 1.4em;
 }
-#content_body p {
+.doctype_case #content_body p {
  text-align: justify;
 }
 #content_body ol, #content_body ul {
@@ -111,6 +111,9 @@ h2 {
 }
 #sidebar h2 {
  font-size: 1.2em;
+}
+code {
+ white-space: nowrap;
 }
 
 /* PAGINATION */
