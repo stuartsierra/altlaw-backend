@@ -29,30 +29,30 @@ class ScraperHandler
   end
 
   def parse_all(downloads)
-    downloads.each {|d| parse(d)}
-    self
+    results = []
+    downloads.each {|d| results.concat(parse(d))}
+    results
   end
 
   def parse(download)
+    results = []
     host = URI.parse(download.request_uri).host
     if candidates = @scrapers[host]
       if scraper = candidates.find {|c| c.accept?(download)}
-        parse_with(scraper, download)
+        results.concat(parse_with(scraper, download))
       else
-        self << { :exception => "No scraper accepted #{download.request_uri}" }
+        results << { :exception => "No scraper accepted #{download.request_uri}" }
       end
     else
-      self << { :exception =>  "No scrapers for #{host}"}
+      results << { :exception =>  "No scrapers for #{host}"}
     end
-    self
-  end
-
-  def <<(x)
-    puts x.to_json
+    results
   end
 
   def parse_with(scraper, download)
-    scraper.parse(download, self)
+    results = []
+    scraper.parse(download, results)
+    results
   rescue Exception => e
     err = {
       :exception => e.inspect,
@@ -64,7 +64,7 @@ class ScraperHandler
       err[:actual] = e.actual
       err[:expected] = e.expected
     end
-    self << err
+    results << err
   end
 end
 
@@ -72,6 +72,8 @@ end
 if $0 == __FILE__
   me = ScraperHandler.new
   $*.each do |arg|
-    me.parse_all_from_file(arg)
+    me.parse_all_from_file(arg).each do |document|
+      puts document.to_json
+    end
   end
 end
