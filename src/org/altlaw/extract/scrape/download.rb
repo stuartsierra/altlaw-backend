@@ -38,7 +38,7 @@ class Download
 
   def to_json(*a)
     hash = {}
-    [FIELDS].each do |key|
+    FIELDS.each do |key|
       value = self.send(key)
       if value
         hash[key] = self.send(key)
