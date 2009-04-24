@@ -60,7 +60,7 @@ class ScraperHandler
       :scraper_name => scraper.class.name,
       :download => download
     }
-    if e.kind_of?(ScraperError)
+    if e.kind_of?(Expect::ExpectationFailed)
       err[:actual] = e.actual
       err[:expected] = e.expected
     end
