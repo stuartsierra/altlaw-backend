@@ -1,5 +1,7 @@
 (ns org.altlaw.util.hadoop
-  (:require [org.altlaw.util.log :as log]))
+  (:require [org.altlaw.util.log :as log]
+            [clojure.contrib.json.read :as json]
+            [clojure.contrib.walk :as walk]))
 
 (defn import-hadoop
   []
@@ -89,6 +91,18 @@
 (defn standard-map [map-fn this wkey wvalue output reporter]
   (let [key (read-string (str wkey))
         value (read-string (str wvalue))]
+    (log/debug "Mapper input: " (pr-str key)
+               " => " (log/logstr value))
+    (binding [*reporter* reporter]
+      (doseq [[key value] (map-fn key value)]
+        (log/debug "Mapper OUTPUT: " (pr-str key)
+                   " => " (log/logstr value))
+        (.collect output (Text. (pr-str key))
+                  (Text. (pr-str value)))))))
+
+(defn json-map [map-fn this wkey wvalue output reporter]
+  (let [key (str wkey)
+        value (walk/keywordize-keys (json/read-json-string (str wvalue)))]
     (log/debug "Mapper input: " (pr-str key)
                " => " (log/logstr value))
     (binding [*reporter* reporter]
