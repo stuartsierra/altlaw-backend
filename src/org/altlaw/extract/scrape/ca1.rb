@@ -1,4 +1,6 @@
 class Ca1
+  include Expect
+
   def accept_host
     "www.ca1.uscourts.gov"
   end
@@ -26,10 +28,10 @@ class Ca1
 
     # Check table headings to make sure nothing's changed.
     cells = first_row.search('th')
-    Expect.match(cells[0].inner_text, 'Date of Issuance')
-    Expect.match(cells[1].inner_text, 'Click forOpinion')
-    Expect.match(cells[2].inner_text, 'Click forDocketSheet')
-    Expect.match(cells[3].inner_text, 'Short Title/District')
+    match(cells[0].inner_text, 'Date of Issuance')
+    match(cells[1].inner_text, 'Click forOpinion')
+    match(cells[2].inner_text, 'Click forDocketSheet')
+    match(cells[3].inner_text, 'Short Title/District')
 
     # Scrape table contents.  Because of weird HTML, the <td>s are
     # not nested within the <tr>s.
@@ -69,7 +71,7 @@ class Ca1
   end
 
   def parse_filename(str)
-    m = Expect.match(str, /^\d{2}-\d{4}([PUE])\d*\.01A$/)
+    m = match(str, /^\d{2}-\d{4}([PUE])\d*\.01A$/)
     case m[1]
     when 'P' then :published
     when 'U' then :unpublished
@@ -78,7 +80,7 @@ class Ca1
   end
 
   def parse_date(str)
-    m = Expect.match(str, %r{^(\d{1,2})/(\d{1,2})/(\d{4})$})
+    m = match(str, %r{^(\d{1,2})/(\d{1,2})/(\d{4})$})
     month, day, year = m[1], m[2], m[3]
     Date.civil(year.to_i, month.to_i, day.to_i)
   end
