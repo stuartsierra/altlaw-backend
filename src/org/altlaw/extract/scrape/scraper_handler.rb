@@ -6,10 +6,13 @@ require 'org/altlaw/extract/scrape/download'
 require 'org/altlaw/extract/scrape/expect'
 require 'org/altlaw/extract/scrape/ca1'
 
-class RunScraper
+class ScraperHandler
+
+  SCRAPER_CLASSES = [Ca1]
+
   def initialize
     @scrapers = {}
-    [Ca1].each do |klass|
+    SCRAPER_CLASSES.each do |klass|
       scraper = klass.new
       host = scraper.accept_host
       @scrapers[host] ||= []
@@ -67,7 +70,7 @@ end
 
 
 if $0 == __FILE__
-  me = RunScraper.new
+  me = ScraperHandler.new
   $*.each do |arg|
     me.parse_all_from_file(arg)
   end
