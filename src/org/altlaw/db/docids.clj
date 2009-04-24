@@ -41,3 +41,11 @@
 (defn save-docids [collection]
   (data/save-data (str "docids/" collection)))
 
+(defn make-docid-request [collection keys]
+  {:collection collection, :keys keys})
+
+(defn handle-docid-request [request]
+  (assert (contains? request :collection))
+  (assert (contains? request :keys))
+  (assert (coll? (:keys request)))
+  (assign-next-docid (:collection request) (:keys request)))
