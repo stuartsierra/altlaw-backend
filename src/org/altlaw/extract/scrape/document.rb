@@ -5,7 +5,7 @@ class Document
   :norobots, :removed, :precedential, :appeal_from, :subject, :author,
   :abstract, :decided_by, :opinion_type, :links]
 
-  attr_accessor(  )
+  attr_accessor(*FIELDS)
 
   def initialize
     @links = {}
