@@ -178,8 +178,9 @@ div.citelinks div.citelink {
 .doctype_search .hit {
  margin: 15px;
 }
-.doctype_search .name {
+.doctype_search .name a {
  font-size: 115%;
+ text-decoration: underline;                
 }
 .doctype_search .court {
  font-style: italic;
