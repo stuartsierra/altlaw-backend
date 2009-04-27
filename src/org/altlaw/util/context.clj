@@ -56,3 +56,9 @@
   (or (get-property-function "org.altlaw.aws.secret.access.key")
       (get-property-function "fs.s3.awsSecretAccessKey")
       (throw (Exception. "No AWS Secret Access Key (tried org.altlaw.aws.secret.access.key and fs.s3.awsSecretAccessKey)"))))
+
+(defn admin-username []
+  (get-property "org.altlaw.www.admin.username"))
+
+(defn admin-password []
+  (get-property "org.altlaw.www.admin.password"))
