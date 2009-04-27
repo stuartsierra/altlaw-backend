@@ -45,6 +45,8 @@ cat > /tmp/remote-prepare-www.sh <<EOF
 
 echo "export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> ~/.bashrc
 echo "export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> ~/.bashrc
+echo "export ALTLAW_WWW_ADMIN_USERNAME=$ALTLAW_WWW_ADMIN_USERNAME" >> ~/.bashrc
+echo "export ALTLAW_WWW_ADMIN_PASSWORD=$ALTLAW_WWW_ADMIN_PASSWORD" >> ~/.bashrc
 
 ALTLAW_HOME=/mnt/altlaw
 HADOOP_HOME=/mnt/hadoop
