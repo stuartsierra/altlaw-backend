@@ -18,15 +18,13 @@
 
 (defn gen-markdown-page [markdown-text]
   (let [[contenthead contentbody] (seq (.split markdown-text "---\n" 2))]
-    (render :xhtml_page
+    (render :default_layout
             :html_title "AltLaw, the free legal search engine"
-            :html_head (render :default_html_head
-                               :verify true)
-            :html_body (render :default_layout
-                               :page_class "doctype_about"
-                               :content_head (markdown contenthead)
-                               :content_body (markdown contentbody)
-                               :sidebar (render :sidebar_about_pages)))))
+            :verify true
+            :page_class "doctype_about"
+            :content_head (markdown contenthead)
+            :content_body (markdown contentbody)
+            :sidebar (render "about/about_sidebar"))))
 
 (defn save-static-page [source-file]
   (let [target-file (html-output-file source-file)]
