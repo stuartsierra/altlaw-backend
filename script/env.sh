@@ -37,6 +37,9 @@ JAVA_OPTS="$JAVA_OPTS -Dorg.altlaw.home=$ALTLAW_HOME"
 JAVA_OPTS="$JAVA_OPTS -Dorg.altlaw.env=$ALTLAW_ENV"
 JAVA_OPTS="$JAVA_OPTS -Dorg.altlaw.aws.access.key.id=$AWS_ACCESS_KEY_ID"
 JAVA_OPTS="$JAVA_OPTS -Dorg.altlaw.aws.secret.access.key=$AWS_SECRET_ACCESS_KEY"
+JAVA_OPTS="$JAVA_OPTS -Dorg.altlaw.www.admin.username=$ALTLAW_WWW_ADMIN_USERNAME"
+JAVA_OPTS="$JAVA_OPTS -Dorg.altlaw.www.admin.password=$ALTLAW_WWW_ADMIN_PASSWORD"
+
 
 JAVA="$JAVA_HOME/bin/java -cp $CP $JAVA_OPTS"
 
