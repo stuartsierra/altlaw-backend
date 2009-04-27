@@ -9,6 +9,5 @@
   </head>
   <body>
     $html_body$
-    $analytics()$
   </body>
 </html>

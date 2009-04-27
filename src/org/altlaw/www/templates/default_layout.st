@@ -1,3 +1,8 @@
+$xhtml_page(
+
+    html_head=default_html_head(),
+
+    html_body={
 <div id="container" class="$page_class$">
   <div id="site_head">
     <p id="site_logo">
@@ -41,3 +46,6 @@
     <p>DISCLAIMER: The people behind AltLaw are not your lawyers, and nothing on this site should be considered legal advice. We also make no representations or promises about the completeness, accuracy, or timeliness of any of the content on the site. AltLaw is a beta-release project, and we recommend that before relying on our site, you double-check your results with another legal research resource.</p>
   </div>
 </div>
+$analytics()$
+}
+)$
