@@ -99,57 +99,26 @@
      :hits (map (partial prepare-hit (.getHighlighting solr-response))
                 docs)}))
 
-(defn html-exception-layout [data]
-  (let [root-cause (loop [e (:exception data)]
-                     (if-let [cause (.getCause e)]
-                       (recur cause) e))]
-    (tmpl/render :default_layout
-                 :page_class "doctype_search"
-                 :content_head "<h1>Search Error</h1>"
-                 :content_body (tmpl/render
-                                :error :message
-                                (if (= "development" (context/altlaw-env))
-                                  (with-out-str
-                                    (print "<pre>")
-                                    (stacktrace/print-cause-trace root-cause 15)
-                                    (print "</pre>"))
-                                  (.getMessage root-cause))))))
-
 (defn html-exception [data]
-  (tmpl/render :xhtml_page
-               :html_title "Search Error - AltLaw"
-               :html_head (tmpl/render :default_html_head)
-               :html_body (html-exception-layout data)))
-
-(defn html-results-layout [data]
-  (tmpl/render :default_layout
-               :page_class "doctype_search"
-               :content_head (tmpl/render :html_search_results_head data)
-               :content_body (tmpl/render :html_search_results_body data)
-               :sidebar ""))
+  (tmpl/render "search/error_page"
+               :error_message
+               (if (= "development" (context/altlaw-env))
+                 (with-out-str
+                   (print "<pre>")
+                   (stacktrace/print-cause-trace (:exception data) 15)
+                   (print "</pre>"))
+                 (.getMessage (stacktrace/root-cause (:exception data))))))
 
 (defn html-results [ref data]
   (let [params (.. ref getQueryAsForm getValuesMap)
         current-page (Integer/parseInt (or (get params "page") "1"))
         pagination (when (> (:total_hits data) *page-size*)
                      (pagination-html ref current-page (:total_hits data)))]
-    (tmpl/render :xhtml_page
-                 :html_title "Search Results - AltLaw"
-                 :html_head (tmpl/render :default_html_head)
-                 :html_body (html-results-layout (assoc data
-                                                   :pagination pagination)))))
-
-(defn html-no-results-layout [data]
-  (tmpl/render :default_layout
-               :page_class "doctype_search"
-               :content_head (tmpl/render :html_search_results_head data)
-               :content_body "<p>No search results.</p>"))
+    (tmpl/render "search/html_results"
+                 (assoc data :pagination pagination))))
 
 (defn html-no-results [data]
-  (tmpl/render :xhtml_page
-               :html_title "No Results - AltLaw"
-               :html_head (tmpl/render :default_html_head)
-               :html_body (html-no-results-layout data)))
+  (tmpl/render "search/html_no_results" data))
 
 (defn order-for-display [sort]
   (cond
@@ -198,19 +167,8 @@
 
 ;;; RENDERING BLANK FORMS
 
-(defn html-form-layout [query-type]
-  (let [type (name query-type)]
-    (tmpl/render :default_layout
-                 :page_class "doctype_search"
-                 :content_head (str "<h1>" (StringUtils/capitalize type)
-                                    " Search</h1>")
-                 :content_body (tmpl/render (str type "_search_page")))))
-
 (defn html-form [query-type]
-  (tmpl/render :xhtml_page
-               :html_title "Search - AltLaw"
-               :html_head (tmpl/render :advanced_search_html_head)
-               :html_body (html-form-layout query-type)))
+  (tmpl/render (str "search/" (name query-type) "_search_page")))
 
 
 (defmulti render-blank-form (fn [this variant search-type] (.getMediaType variant)))
