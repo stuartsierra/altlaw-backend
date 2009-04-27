@@ -1,1 +1,1 @@
-$org/altlaw/www/templates/advanced_search_form()$
+$advanced_search_form()$

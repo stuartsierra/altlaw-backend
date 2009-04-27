@@ -9,6 +9,6 @@
   </head>
   <body>
     $html_body$
-    $org/altlaw/www/templates/analytics()$
+    $analytics()$
   </body>
 </html>
