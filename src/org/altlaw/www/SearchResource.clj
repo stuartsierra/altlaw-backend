@@ -23,6 +23,7 @@
 (defn log [this & args]
   (.. this getContext getLogger (info (apply str args))))
 
+
 ;;; PAGE NUMBERING
 
 (def *page-size* 10)
@@ -68,19 +69,25 @@
 
 ;;; RENDERING RESULTS
 
-(defn prepare-hit [doc]
-  (let [name (.getFieldValue doc "name")
+(defn get-snippets [highlights docid]
+  (when-let [h (get highlights (str docid))]
+    (get h "text")))
+
+(defn prepare-hit [highlights doc]
+  (let [docid (.getFieldValue doc "docid")
+        name (.getFieldValue doc "name")
         the-name (if (or (nil? name) (empty? name))
                    (str "Untitled #" (.getFieldValue doc "docid"))
                    name)]
-  {:docid (.getFieldValue doc "docid")
-   :url (format "/v1/cases/%s" (.getFieldValue doc "docid"))
+  {:docid docid
+   :url (format "/v1/cases/%s" docid)
    :size (when-let [size (.getFieldValue doc "size")]
            (int (Math/ceil (/ size 1024.0))))
    :date (date/format-long-date (.getFieldValue doc "date"))
    :court (courts/*court-names* (.getFieldValue doc "court"))
    :name (tmpl/h the-name)
-   :citations (map tmpl/h (.getFieldValues doc "citations"))}))
+   :citations (map tmpl/h (.getFieldValues doc "citations"))
+   :snippets (get-snippets highlights docid)}))
 
 (defn prepare-solr-results [solr-response]
   (let [docs (.getResults solr-response)]
@@ -89,7 +96,8 @@
      :total_hits (.getNumFound docs)
      :start_hit (if (zero? (.getNumFound docs)) 0 (inc (.getStart docs)))
      :end_hit (+ (.getStart docs) (count docs))
-     :hits (map prepare-hit docs)}))
+     :hits (map (partial prepare-hit (.getHighlighting solr-response))
+                docs)}))
 
 (defn html-exception-layout [data]
   (let [root-cause (loop [e (:exception data)]
@@ -262,6 +270,13 @@
 (defn apply-sort-options [solr-query this]
   (.setSortField solr-query (get-sort-field this) SolrQuery$ORDER/desc))
 
+(defn apply-highlight-options [solr-query]
+  (doto solr-query
+    (.setHighlight true)
+    (.setHighlightFragsize 120)
+    (.setHighlightRequireFieldMatch true)
+    (.setHighlightSnippets 3)))
+
 (defmulti get-solr-query (fn [this type] type))
 
 (defmethod get-solr-query :simple [this type]
@@ -270,7 +285,8 @@
       (log this "Preparing simple search for " (pr-str q))
       (doto (SolrQuery. q)
         (.setQueryType "dismax")
-        (apply-sort-options this)))))
+        (apply-sort-options this)
+        (apply-highlight-options)))))
 
 (defmethod get-solr-query :boolean [this type]
   (let [params (get-query-params this)]
@@ -278,7 +294,8 @@
       (log this "Preparing boolean search for " (pr-str q))
       (doto (SolrQuery. q)
         (.setQueryType "standard")
-        (apply-sort-options this)))))
+        (apply-sort-options this)
+        (apply-highlight-options)))))
 
 (defmethod get-solr-query :citation [this type]
   (let [params (get-query-params this)]
