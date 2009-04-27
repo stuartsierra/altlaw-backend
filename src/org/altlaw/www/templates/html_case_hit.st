@@ -3,4 +3,5 @@
   <div class="court">$it.court$</div>
   <div class="date">$it.date$</div>
   <div class="citations">$it.citations; separator="; "$</div>
+  <div class="snippets">$it.snippets:org/altlaw/www/templates/html_snippet()$</div>
 </div>
