@@ -55,6 +55,8 @@ HADOOP_HOME=/mnt/hadoop
 git clone --depth 1 git://github.com/lawcommons/altlaw-backend.git \$ALTLAW_HOME
 cd \$ALTLAW_HOME
 ant
+# create index dir so that we can attach a volume there:
+mkdir -p var/solr/data/index
 
 # install Hadoop
 cd /mnt
