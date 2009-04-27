@@ -1,0 +1,233 @@
+/* Browser reset */
+h1,h2,h3,h4,h5,h6,pre,code,p {font-size: 1em; font-weight: normal;}
+ul,ol,dl,li,dt,dd,h1,h2,h3,h4,h5,h6,pre,form,body,html,p,blockquote,fieldset,input {margin: 0; padding: 0;}
+a img,:link img,:visited img {border: none;}
+address {font-style: normal;}
+
+/* SITE HEADER & SEARCH BOX */
+#container {
+ font-family: Helvetica, Arial, sans-serif;
+ font-size: small;
+ margin: 15px;
+ width: 850px;
+}
+#site_head {
+ background: #e2e0ff;
+ float: left;
+ margin-bottom: 15px;
+ width: 100%;
+}
+#site_logo {
+ float: left;
+ width: 187px;
+ padding: 10px 15px 10px 15px;
+}
+#site_search {
+ float: left;
+}
+#site_search p {
+ margin: 10px 15px 10px 15px;
+}
+#site_links {
+ float: right;
+}
+#site_links ul {
+ list-style: disc;
+ margin: 10px 15px 10px 15px;
+}
+
+/* SIDEBAR */
+#site_body {
+ clear: both;
+}
+#sidebar {
+ background: #ddeaff;
+ float: left;
+ width: 225px;
+}
+#sidebar h2, #sidebar p, #sidebar ul {
+ margin: 10px 15px 10px 15px;
+}
+#sidebar ul {
+ list-style: disc;
+ margin-left: 30px;
+}
+
+/* FOOTER */
+#site_foot {
+ background: #d3d3d3;
+ clear: both;
+}
+#site_foot p {
+ margin: 10px 15px 10px 15px;
+}
+
+/* CONTENT AREA */
+#content {
+ float: left;
+ width: 625px;
+}
+#content_head {
+ background: #ddeaff;
+}
+#content_head p, #content_head h1 {
+ margin: 0 15px 0 15px;
+}
+#content_head h1 {
+ padding-top: 10px;
+}
+#content_body p, #content_body h2 {
+ margin: 10px 15px 10px 15px;
+ line-height: 1.4em;
+}
+.doctype_case #content_body p {
+ text-align: justify;
+}
+#content_body ol, #content_body ul {
+ margin: 10px 15px 10px 50px;
+}
+#content_body div.error {
+ border: 2px solid red;
+ background-color: #ffcccc;
+ text-align: left;
+}
+
+/* GENERAL TYPOGRAPHY */
+a {
+ color: #0000ff;
+ text-decoration: none;
+}
+a:visited {
+ color: #3300cc;
+}
+a:hover,a:active {
+ text-decoration: underline;
+}
+h1 {
+ font-size: 2em;
+}
+h2 {
+ font-size: 1.5em;
+}
+#sidebar h2 {
+ font-size: 1.2em;
+}
+code {
+ white-space: nowrap;
+}
+
+/* PAGINATION */
+div.pagination {margin: 15px 0 15px 0; padding: 1px; clear: both}
+div.pagination ul {margin-left: 0; list-style-type: none; padding: 2px 2px 2px 0; text-align: left; display: inline}
+div.pagination li {display: inline; padding-bottom: 1px}
+div.pagination a {padding: 0 5px; text-decoration: none}
+div.pagination a:hover, .pagination a:active {text-decoration: underline}
+div.pagination li.currentpage {font-weight: bold; padding: 0 5px; border: 1px solid #000; color: #000}
+div.pagination li.disablepage {padding: 0 5px; color: #bbb}
+
+
+/* DOCUMENT-SPECIFIC LAYOUT */
+div.citelinks {
+ font-family: sans-serif;
+ float: left;
+ width: 100%;
+}
+div.citelinks div.outcites {
+ float: left;
+ width: 49%;
+}
+div.citelinks div.incites {
+ float: right;
+ width: 49%;
+}
+div.citelinks div.citelink {
+ margin: 15px;
+}
+
+
+/* DOCUMENT-SPECIFIC TYPOGRAPHY */
+.doctype_case #content_head .court {
+ font-style: italic;
+}
+.doctype_case #content_body {
+ font-family: Georgia, "Times New Roman", serif;
+}
+.doctype_case div.num {
+ margin-left: 20px;
+ position: relative;
+}
+.doctype_case span.num {
+ color: gray;
+ left: -20px;
+ position: absolute;
+}
+.doctype_case p.indent {
+ text-indent: 1em;
+}
+.doctype_case .center {
+ font-weight: bold;
+ text-align: center;
+}
+.doctype_case a.footnote:before {
+ content: "["
+}
+.doctype_case a.footnote:after {
+ content: "]"
+}
+              
+.doctype_search .hit {
+ margin: 15px;
+}
+.doctype_search .name {
+ font-size: 115%;
+}
+.doctype_search .court {
+ font-style: italic;
+}
+.doctype_search .hit .snippets {
+ color: #444444;
+ margin: 0 0 0 1em;
+}
+.doctype_search .hit .snippets em {
+ font-style: normal;
+ font-weight: bold;
+}
+.doctype_search .hit_range, .doctype_search .total_hits, 
+.doctype_search .query, .doctype_search order {
+ font-weight: bold;
+}
+div.sortlinks {margin: 0 15px 0 15px; padding: 0; clear: both}
+div.sortlinks ul {margin-left: 0; list-style-type: none; padding: 0; text-align: left; display: inline}
+div.sortlinks li {display: inline; padding-bottom: 1px}
+div.sortlinks a {padding: 0 5px; text-decoration: none}
+div.sortlinks a:hover, .sortlinks a:active {text-decoration: underline}
+div.sortlinks li.currentpage {font-weight: bold; padding: 0 5px; border: 1px solid #000; color: #000}
+div.sortlinks li.disablepage {padding: 0 5px; color: #bbb}
+
+.boolean_search_doc {
+ margin: 0 15px 0 15px;
+}
+.boolean_search_doc dt {
+ font-weight: bold;
+ margin-top: 1em;
+}
+.boolean_search_doc var {
+ font-weight: normal;
+}
+
+#advanced_search_form td {
+ padding: 5px;
+ text-align: left;
+}
+#advanced_search_form th {
+ padding: 5px;
+ text-align: right;
+}
+#advanced_search_form tr.alt {
+ background: #f2f0ff;
+}
+#advanced_search_form div.checkboxes label {
+ margin-right: 30px;
+ line-height: 2em;
+ white-space: nowrap;
+}
