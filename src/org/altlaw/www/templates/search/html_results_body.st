@@ -1,3 +1,3 @@
 $pagination$
-$hits:html_case_hit()$
+$hits:search/html_hit()$
 $pagination$
