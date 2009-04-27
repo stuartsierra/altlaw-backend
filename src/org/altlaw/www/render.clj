@@ -1,16 +1,13 @@
 (ns org.altlaw.www.render
-  (:require [org.altlaw.util.context :as context])
+  (:require [org.altlaw.util.context :as context]
+            [clojure.contrib.java-utils :as java]
+            [clojure.contrib.classpath :as cp]
+            [clojure.contrib.singleton :as sing])
   (:use [clojure.contrib.test-is :only (with-test is testing)]
-        [clojure.contrib.duck-streams :only (reader)]
         [clojure.contrib.walk :only (stringify-keys)])
   (:import (org.antlr.stringtemplate StringTemplate StringTemplateGroup)
            (org.antlr.stringtemplate.language DefaultTemplateLexer)
            (org.apache.commons.lang StringEscapeUtils)))
-
-(defn- string [x]
-  (if (keyword? x)
-    (name x)
-    (str x)))
 
 (with-test
  (defn- render-template
@@ -53,14 +50,24 @@
                                    "Foo: $user:{f$it.foo$}$")
                                   {:user [{:foo 1} {:foo 2} {:foo 3}]})))))
 
+(defn www-templates-dir []
+  (some
+   (fn [dir]
+     (let [template-dir
+           (java/file dir "org" "altlaw" "www" "templates")]
+       (when (.exists template-dir) template-dir)))
+   (cp/classpath-directories)))
+
 (def #^{:private true} template-group
-     (memoize (fn []
-                (let [page-templates (StringTemplateGroup. "org.altlaw.www.templates")]
-                  ;; By default, templates are never refreshed.
-                  ;; In development mode, always refresh.
-                  (when (= (context/altlaw-env) "development")
-                    (.setRefreshInterval page-templates 0))
-                  page-templates))))
+     (sing/global-singleton
+      (fn []
+        (let [page-templates (StringTemplateGroup. "org.altlaw.www.templates"
+                                                   (str (www-templates-dir)))]
+          ;; By default, templates are never refreshed.
+          ;; In development mode, always refresh.
+          (when (= (context/altlaw-env) "development")
+            (.setRefreshInterval page-templates 0))
+          page-templates))))
 
 (with-test
  (defn render
@@ -69,7 +76,7 @@
    render-template."
    [name & attrs]
    (-> (template-group)
-       (.getInstanceOf (str "org/altlaw/www/templates/" (string name)))
+       (.getInstanceOf (java/as-str name))
        (render-template (if (map? (first attrs))
                           (if (next attrs)
                             (apply conj (first attrs) (next attrs))
