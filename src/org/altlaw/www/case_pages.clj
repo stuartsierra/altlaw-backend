@@ -17,7 +17,7 @@
                     (= :html k) v
                     (= :date k) (date/format-long-date v)
                     (= :court k) (courts/*court-names* v)
-                    (= :name k) (if (or (nil? v) (empty? v))
+                    (= :name k) (if (empty? v)
                                   (str "Untitled #" (:docid doc))
                                   (tmpl/h v))
                     (#{:citations :dockets} k) (map tmpl/h v)
@@ -49,12 +49,10 @@
 ;;; TEXT PAGES
 
 (defmethod gen-case-layout :text [type doc]
-  (tmpl/render :default_layout
-               :page_class (str "doctype_" (:doctype doc))
-               :content_head (tmpl/render :case_head_layout doc)
-               :content_body (:html doc)
-               :sidebar (tmpl/render :case_sidebar
-                                     :doclinks (doclinks doc))))
+  (tmpl/render "case/text_page"
+               doc
+               :norobots (priv/norobots? (:docid doc))
+               :doclinks (doclinks doc)))
 
 
 ;;; CITATION PAGES
@@ -68,28 +66,18 @@
   
 
 (defmethod gen-case-layout :citations [type doc]
-  (let [in (prepare-citelinks (:incites doc))
-        out (prepare-citelinks (:outcites doc))]
-    (tmpl/render :default_layout
-                 :page_class (str "doctype_" (:doctype doc))
-                 :content_head (tmpl/render :case_head_layout doc)
-                 :content_body (tmpl/render :citelinks
-                                            :incites in
-                                            :outcites out)
-                 :sidebar (tmpl/render :case_sidebar
-                                       :doclinks (doclinks doc)))))
+  (tmpl/render "case/citations_page"
+               doc
+               :incites (prepare-citelinks (:incites doc))
+               :outcites (prepare-citelinks (:outcites doc))
+               :doclinks (doclinks doc)))
 
 
 ;;; GENERATE ALL PAGES
 
 (defn gen-case-page [type doc]
   (let [escaped (escape-fields doc)]
-    (tmpl/render :xhtml_page
-                 :html_title (str (:name escaped) " - AltLaw")
-                 :html_head (tmpl/render :default_html_head
-                                         :norobots (or (= type :citations)
-                                                       (priv/norobots? (:docid doc))))
-                 :html_body (gen-case-layout type escaped))))
+    (gen-case-layout type escaped)))
 
 (defn all-files [doc]
   (reduce (fn [m type]
