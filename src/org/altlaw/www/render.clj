@@ -79,7 +79,7 @@
        (.getInstanceOf (java/as-str name))
        (render-template (if (map? (first attrs))
                           (if (next attrs)
-                            (apply conj (first attrs) (next attrs))
+                            (apply assoc (first attrs) (next attrs))
                             (first attrs))
                           (apply array-map attrs)))))
 
