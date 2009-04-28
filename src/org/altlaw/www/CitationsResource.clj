@@ -15,11 +15,11 @@
 (declare *solr*)
 
 (def *display-fields*
-     (into-array ["doctype" "docid" "name" "citations"
+     (into-array ["docid" "doctype" "name" "citations"
                   "date" "court" "size"]))
 
 (def *cite-fields*
-     (into-array ["doctype" "docid" "name" "citations"
+     (into-array ["docid" "doctype" "name" "citations"
                   "date" "court"]))
 
 (defn get-document-query [docid]
@@ -62,6 +62,7 @@
 (defn prepare-cite-document
   [doc]
   {:docid (.getFieldValue doc "docid")
+   :doctype (.getFieldValue doc "doctype")
    :name (.getFieldValue doc "name")
    :date (.getFieldValue doc "date")
    :court (.getFieldValue doc "court")
@@ -72,6 +73,7 @@
   for use by case-pages/gen-case-page"
   [doc incite-docs outcite-docs]
   {:docid (.getFieldValue doc "docid")
+   :doctype (.getFieldValue doc "doctype")
    :name (.getFieldValue doc "name")
    :date (.getFieldValue doc "date")
    :court (.getFieldValue doc "court")
