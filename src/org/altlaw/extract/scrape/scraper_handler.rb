@@ -6,6 +6,20 @@ require 'org/altlaw/extract/scrape/download'
 require 'org/altlaw/extract/scrape/expect'
 require 'org/altlaw/extract/scrape/ca1'
 
+class Hash
+  def stringify
+    inject({}) do |hash, (key, value)|
+      if value.instance_of?(Date)
+        value = value.to_s
+      elsif value.kind_of?(Hash)
+        value = value.stringify
+      end
+      hash[key.to_s] = value
+      hash
+    end
+  end
+end
+
 class ScraperHandler
 
   SCRAPER_CLASSES = [Ca1]
@@ -46,7 +60,7 @@ class ScraperHandler
     else
       results << { :exception =>  "No scrapers for #{host}"}
     end
-    results
+    results.map {|r| r.stringify}
   end
 
   def parse_with(scraper, download)
