@@ -115,6 +115,9 @@ h2 {
 code {
  white-space: nowrap;
 }
+div.footnotes {
+ border-top: 1px solid #bbb;
+}
 
 /* PAGINATION */
 div.pagination {margin: 15px 0 15px 0; padding: 1px; clear: both}
