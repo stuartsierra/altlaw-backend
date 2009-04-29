@@ -16,7 +16,7 @@
 
 (defn pdf-to-html [filename bytes]
   (try 
-   (String. (.exec (get-runner) bytes))
+   (String. (.exec (get-runner) bytes) "UTF-8")
    (catch ExecuteException e
      (log/warn "altlaw_parse_pdf failed on " filename ": " e)
      nil)))
