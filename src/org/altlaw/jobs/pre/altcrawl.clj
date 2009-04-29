@@ -5,12 +5,16 @@
             [org.altlaw.util.jruby :as ruby]
             [org.altlaw.util.context :as context]
             [org.altlaw.util.log :as log]
+            [org.altlaw.util.merge-fields :as merge]
             [org.altlaw.db.docids :as ids]
+            [org.altlaw.extract.pdf :as pdf]
             [clojure.contrib.walk :as walk]
-            [clojure.contrib.singleton :as sing])
+            [clojure.contrib.singleton :as sing]
+            [clojure.set :as set])
   (:use clojure.contrib.json.read
         org.altlaw.util.log)
-  (:import (org.apache.commons.codec.binary Base64)
+  (:import (org.altlaw.extract PROHTMLToText)
+           (org.apache.commons.codec.binary Base64)
            (javax.script ScriptContext ScriptEngine ScriptEngineManager)
            (java.io StringReader)))
 
@@ -39,7 +43,7 @@
 ;;  |                   |                 |
 ;; handle-html         handle-pdf        warn
 ;;  |       |           |      |              
-;;  |      warn         |     request Docid   
+;;  |      warn         |     warn
 ;;  |                   |                     
 ;; scraper-dispatch    convert-pdf            
 ;;  |
@@ -54,20 +58,50 @@
 
 ;; Step 3 (for HTML): Run scrapers
 
+(defn get-primary-url [record]
+  (when-let [links (get record "links")]
+    (get links "application/pdf")))
+
+(defn get-all-urls [record]
+  (when-let [links (get record "links")]
+    (vals links)))
+
+(defn rubyhash-to-map [hash]
+  (reduce (fn [m [k v]]
+            (assoc m (keyword k)
+                   (if (instance? java.util.Map v)
+                     (into {} v)  ;; don't keywordize MIME types
+                     (str v))))
+          {} hash))
+
 (defn handle-scraper-record [record]
-  [101 (pr-str (into {} record))])
+  (let [data (into {} record)]
+    (if (contains? data "exception")
+      (do (h/counter "Scraper errors")
+          [:scraper-error (rubyhash-to-map data)])
+      (if-let [url (get-primary-url data)]
+        (if-let [docid (ids/get-docid "altcrawl" url)]
+          [docid (rubyhash-to-map data)]
+          [:docid-request (ids/make-docid-request "altcrawl" (get-all-urls data))])
+        (do (h/counter "No primary URL")
+            (log/warn "No primary URL among " (pr-str (get-all-urls data)))
+            nil)))))
 
 (defn run-scrapers [download]
-  (map handle-scraper-record
-       (ruby/eval-jruby "$handler.parse(Download.from_map($dmap))"
-                        {:dmap (walk/stringify-keys download)
-                         :handler (scraper-handler)})))
+  (filter identity
+          (map handle-scraper-record
+               (ruby/eval-jruby "$handler.parse(Download.from_map($dmap))"
+                                {:dmap (walk/stringify-keys download)
+                                 :handler (scraper-handler)}))))
 
 
 ;;; Step 4 (for PDFs): convert to HTML
 
 (defn convert-pdf [docid download]
-  (debug "converting PDF to HTML for " (:request_uri download)))
+  (debug "converting PDF to HTML for " (:request_uri download))
+  (let [html (pdf/pdf-to-html (str docid) (:response_body_bytes download))
+        text (PROHTMLToText/filter html)]
+    [[docid {:html html, :text text}]]))
 
 ;;; Step 3 (for PDFs): dispatch on presence of Docid
 
@@ -77,7 +111,8 @@
         (h/counter "PDF files" "with docid")
         (convert-pdf docid download))
     (do (warn "handle-pdf found no docid for " (:request_uri download))
-        (h/counter "PDF files" "no docid"))))
+        (h/counter "PDF files" "no docid")
+        nil)))
 
 
 ;;; Step 2: dispatch on MIME type of the download
@@ -117,6 +152,30 @@
 
 
 
+;;; REDUCER IMPLEMENTATION
+
+(defn merge-docs [docid documents]
+  (let [doc (merge/merge-fields documents)]
+    (if (and (:html doc) (:text doc))
+      [[docid doc]]
+      (do (h/counter "No html/text")
+          (log/warn "No html/text; skipping " docid)))))
+
+(defn assign-docids [requests]
+  (doseq [r requests]
+    (ids/handle-docid-request r))
+  (ids/save-docids "altcrawl")
+  (ids/save-next-docid)
+  nil)
+
+(defn my-reduce [key documents]
+  (cond
+    (= key :docid-request) (assign-docids documents)
+    (= key :exception) nil
+    (integer? key) (merge-docs key documents)))
+
+
+
 ;;; MAPPER METHODS
 
 (defn mapper-configure [this job]
@@ -128,9 +187,11 @@
 
 ;;; REDUCER METHODS
 
-(defn reducer-reduce [this wkey values-iter output reporter]
-  (debug "Called reduce with key " wkey " and "
-         (count (iterator-seq values-iter)) " values."))
+(defn reducer-configure [this job]
+  (context/use-hadoop-jobconf job))
+
+(def reducer-reduce (partial h/standard-reduce my-reduce))
+
 
 
 
