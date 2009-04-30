@@ -59,33 +59,24 @@
 ;; Step 3 (for HTML): Run scrapers
 
 (defn get-primary-url [record]
-  (when-let [links (get record "links")]
+  (when-let [links (get record :links)]
     (get links "application/pdf")))
 
 (defn get-all-urls [record]
-  (when-let [links (get record "links")]
+  (when-let [links (get record :links)]
     (vals links)))
 
-(defn rubyhash-to-map [hash]
-  (reduce (fn [m [k v]]
-            (assoc m (keyword k)
-                   (if (instance? java.util.Map v)
-                     (into {} v)  ;; don't keywordize MIME types
-                     (str v))))
-          {} hash))
-
 (defn handle-scraper-record [record]
-  (let [data (into {} record)]
-    (if (contains? data "exception")
-      (do (h/counter "Scraper errors")
-          [:scraper-error (rubyhash-to-map data)])
-      (if-let [url (get-primary-url data)]
-        (if-let [docid (ids/get-docid "altcrawl" url)]
-          [docid (rubyhash-to-map data)]
-          [:docid-request (ids/make-docid-request "altcrawl" (get-all-urls data))])
-        (do (h/counter "No primary URL")
-            (log/warn "No primary URL among " (pr-str (get-all-urls data)))
-            nil)))))
+  (h/counter "Scraper output records" "Total")
+  (let [data (ruby/convert-jruby record)]
+    (if (contains? data :exception)
+      (do (h/counter "Scraper output records" "Errors")
+          [:scraper-error data])
+      (if-let [docid (some #(ids/get-docid "altcrawl" %) (get-all-urls data))]
+        (do (h/counter "Scraper output records" "With docid")
+            [docid data])
+        (do (h/counter "Scraper output records" "Docid requested")
+            [:docid-request (ids/make-docid-request "altcrawl" (get-all-urls data))])))))
 
 (defn run-scrapers [download]
   (filter identity
