@@ -41,7 +41,7 @@
 ;; mime-type-dispatch----------------------
 ;;  |                   |                 |
 ;;  |                   |                 |
-;; handle-html         handle-pdf        warn
+;; handle-html         pdf-docid-dispatch        warn
 ;;  |       |           |      |              
 ;;  |      warn         |     warn
 ;;  |                   |                     
@@ -105,12 +105,12 @@
 
 ;;; Step 3 (for PDFs): dispatch on presence of Docid
 
-(defn handle-pdf [download]
+(defn pdf-docid-dispatch [download]
   (if-let [docid (ids/get-docid "altcrawl" (:request_uri download))]
-    (do (debug "handle-pdf got docid " docid " for " (:request_uri download))
+    (do (debug "pdf-docid-dispatch got docid " docid " for " (:request_uri download))
         (h/counter "PDF files" "with docid")
         (convert-pdf docid download))
-    (do (warn "handle-pdf found no docid for " (:request_uri download))
+    (do (warn "pdf-docid-dispatch found no docid for " (:request_uri download))
         (h/counter "PDF files" "no docid")
         nil)))
 
@@ -124,7 +124,7 @@
 (defmethod mime-type-dispatch "application/pdf" [download]
   (h/counter "MIME types" "PDF")
   (debug "mime-type-dispatch got PDF from " (:request_uri download))
-  (handle-pdf download))
+  (pdf-docid-dispatch download))
 
 (defmethod mime-type-dispatch "text/html" [download]
   (h/counter "MIME types" "HTML")
