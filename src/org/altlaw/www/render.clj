@@ -50,19 +50,16 @@
                                    "Foo: $user:{f$it.foo$}$")
                                   {:user [{:foo 1} {:foo 2} {:foo 3}]})))))
 
-(defn www-templates-dir []
-  (some
-   (fn [dir]
-     (let [template-dir
-           (java/file dir "org" "altlaw" "www" "templates")]
-       (when (.exists template-dir) template-dir)))
-   (cp/classpath-directories)))
+(defn get-string-template-group []
+  (proxy [StringTemplateGroup]
+      ["org.altlaw.www.templates"]
+    (getFileNameFromTemplateName [template-name]
+      (str "org/altlaw/www/templates/" template-name ".st"))))
 
 (def #^{:private true} template-group
      (sing/global-singleton
       (fn []
-        (let [page-templates (StringTemplateGroup. "org.altlaw.www.templates"
-                                                   (str (www-templates-dir)))]
+        (let [page-templates (get-string-template-group)]
           ;; By default, templates are never refreshed.
           ;; In development mode, always refresh.
           (when (= (context/altlaw-env) "development")
