@@ -106,7 +106,7 @@
       <sysproperty key="org.altlaw.aws.access.key.id"
                    value="${env.AWS_ACCESS_KEY_ID}"/>
       <sysproperty key="org.altlaw.aws.secret.access.key"
-                   value="${env.AWS_SECRET_ACCESS_KEY_ID}"/>
+                   value="${env.AWS_SECRET_ACCESS_KEY}"/>
       <classpath refid="class.path"/>
     </java>
     <loadfile srcfile="${file.test.out}" property="test.out.tail">
