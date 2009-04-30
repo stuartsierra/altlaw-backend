@@ -7,6 +7,7 @@
   <property name="dir.var" location="${basedir}/var"/>
   <property name="file.test.out" location="${dir.build}/test.out.log"/>
   <property name="file.test.err" location="${dir.build}/test.err.log"/>
+  <property environment="env"/>
 
   <path id="class.path">
     <fileset dir="${basedir}/lib">
@@ -98,6 +99,14 @@
           error="${file.test.err}">
       <sysproperty key="org.altlaw.home" value="${basedir}"/>
       <sysproperty key="org.altlaw.env" value="testing"/>
+      <sysproperty key="org.altlaw.www.admin.username"
+                   value="testing-user"/>
+      <sysproperty key="org.altlaw.www.admin.password"
+                   value="testing-password"/>
+      <sysproperty key="org.altlaw.aws.access.key.id"
+                   value="${env.AWS_ACCESS_KEY_ID}"/>
+      <sysproperty key="org.altlaw.aws.secret.access.key"
+                   value="${env.AWS_SECRET_ACCESS_KEY_ID}"/>
       <classpath refid="class.path"/>
     </java>
     <loadfile srcfile="${file.test.out}" property="test.out.tail">
