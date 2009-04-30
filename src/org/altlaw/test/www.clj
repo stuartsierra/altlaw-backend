@@ -56,27 +56,6 @@
     (.delete static-dir)))
 
 
-(deftest can-get-case-text
-  (let [docid (str "98765432" (rand-int 10))
-        path (str "docs/98/76/54/32/" docid "-text")
-        html-file (duck/file (context/www-public-dir) "/" path ".html")
-        dir (.getParentFile html-file)
-        html "<html><body>can-get-case-file</body></html>"]
-
-    ;; setup
-    (.mkdirs dir)
-    (duck/spit html-file html)
-
-    ;; Test that we get the HTML file /v1/cases/{docid}
-    (let [response (client/http-get (str "/v1/cases/" docid))]
-      (is (.isSuccess (.getStatus response)))
-      (is (= MediaType/TEXT_HTML (.getMediaType (.getEntity response))))
-      (is (= html (.getText (.getEntity response)))))
-    
-    ;; cleanup
-    (.delete html-file)))
-
-
 (deftest can-get-simple-search-page
   (let [response (client/http-get (str "/v1/search"))]
     (is (.isSuccess (.getStatus response)))))
