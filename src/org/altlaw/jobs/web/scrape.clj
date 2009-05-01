@@ -54,6 +54,8 @@
     ;; (.setReducerClass job org.altlaw.jobs.web.scrape_reducer)
     (.setNumReduceTasks job 0)
     (.setInputFormat job TextInputFormat)
+    (.setOutputFormat job TextOutputFormat)
+    (FileOutputFormat/setOutputCompressorClass job GzipCodec)
     (.setJobName job "web.scrape")
     (JobClient/runJob job))
   0)
