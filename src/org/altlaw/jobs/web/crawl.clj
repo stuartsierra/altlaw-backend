@@ -2,6 +2,7 @@
   (:require [org.altlaw.extract.scrape.handler :as handler]
             [org.altlaw.util.log :as log]
             [org.altlaw.util.hadoop :as h]
+            [org.altlaw.util.date :as date]
             [org.altlaw.util.crawler :as crawler]
             [org.altlaw.util.context :as context]
             [org.altlaw.db.download-log :as dl]
@@ -36,22 +37,18 @@
 (defn reducer-close [this]
   (dl/save-download-log))
 
+
 (defn tool-run [this args]
   (let [job (h/default-jobconf this)
-        outpath (Path. (h/job-path :web :crawl))
-        inpath (Path. (h/job-path :web :requests))
+        inpath (Path. (h/job-path :web :request))
+        outpath (Path. (h/job-path :web :crawl) (str "c-" (date/filename-timestamp)))
         hdfs (FileSystem/get job)]
-    (.delete hdfs inpath true)
-    (with-open [hdfs-stream (.create hdfs (Path. inpath "part-00000") true)]
-      (binding [*out* (duck/writer (.getWrappedStream hdfs-stream))]
-        (doseq [r (handler/all-requests)]
-          (prn r))))
+    (.delete hdfs outpath true)
     (FileInputFormat/setInputPaths job (str inpath))
     (FileOutputFormat/setOutputPath job outpath)
     (FileOutputFormat/setOutputCompressorClass job GzipCodec)
     (.setInputFormat job TextInputFormat)
     (.setOutputFormat job TextOutputFormat)
-    (.delete hdfs outpath true)
     (.setMapperClass job org.altlaw.jobs.web.crawl_mapper)
     (.setReducerClass job org.altlaw.jobs.web.crawl_reducer)
     (.setNumReduceTasks job 1)
