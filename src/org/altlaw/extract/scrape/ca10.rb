@@ -4,7 +4,7 @@ class Ca10
   def accept_host
     'www.ca10.uscourts.gov'
   end
-  
+
   def accept?(download)
     download.request_uri == OPINIONS_URL
   end
@@ -18,7 +18,7 @@ class Ca10
   end
 
   private
-  
+
   BASE_URL = 'http://www.ca10.uscourts.gov'
   OPINIONS_URL = BASE_URL + '/clerk/opinions.php'
 
@@ -37,10 +37,10 @@ class Ca10
         title = a.attributes['title']
         if title != nil
           entry = Document.new
-          entry.court = self.court
+          entry.court = 'http://id.altlaw.org/courts/us/fed/app/10'
           entry.precedential = precedential
           entry.date = Date.today
-          entry.docket = a.inner_html.gsub(/<\/?[^>]*>/, "").gsub(/&nbsp;/,"")
+          entry.dockets << a.inner_html.gsub(/<\/?[^>]*>/, "").gsub(/&nbsp;/,"")
           entry.add_link('application/pdf', BASE_URL + a.attributes["href"])
           entry.name = title
           receiver << entry
