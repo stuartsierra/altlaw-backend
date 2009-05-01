@@ -32,8 +32,13 @@
   (alter (get-next-docid) inc))
 
 (defn assign-next-docid [collection keys]
-  (dosync (set-docid collection keys @(get-next-docid))
-          (increment-next-docid)))
+  (set-docid collection keys @(get-next-docid))
+  (increment-next-docid))
+
+(defn assign-docid [collection keys]
+  (dosync (if-let [docid (some #(get-docid collection %) keys)]
+            (set-docid collection keys docid)
+            (assign-next-docid collection keys))))
 
 (defn save-next-docid []
   (props/set-property "next_docid" @(get-next-docid)))
@@ -48,4 +53,4 @@
   (assert (contains? request :collection))
   (assert (contains? request :keys))
   (assert (coll? (:keys request)))
-  (assign-next-docid (:collection request) (:keys request)))
+  (assign-docid (:collection request) (:keys request)))
