@@ -3,6 +3,7 @@ require 'hpricot'
 require 'date'
 
 require 'org/altlaw/extract/scrape/download'
+require 'org/altlaw/extract/scrape/download_request'
 require 'org/altlaw/extract/scrape/expect'
 require 'org/altlaw/extract/scrape/ca1'
 
@@ -32,6 +33,18 @@ class ScraperHandler
       @scrapers[host] ||= []
       @scrapers[host] << scraper
     end
+  end
+
+  def all_requests
+    requests = []
+    @scrapers.each do |host, scrapers|
+      scrapers.each do |scraper|
+        if req = scraper.request
+          requests << req.to_hash
+        end
+      end
+    end
+    requests
   end
 
   def parse_all_from_file(filename)
