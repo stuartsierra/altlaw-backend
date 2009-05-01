@@ -48,7 +48,7 @@
         outpath (Path. (h/job-path :web :scrape))
         hdfs (FileSystem/get job)]
     (.delete hdfs outpath true)
-    (FileInputFormat/setInputPaths job (str inpath))
+    (FileInputFormat/setInputPaths job (str inpath "/c-*"))
     (FileOutputFormat/setOutputPath job outpath)
     (.setMapperClass job org.altlaw.jobs.web.scrape_mapper)
     ;; (.setReducerClass job org.altlaw.jobs.web.scrape_reducer)
