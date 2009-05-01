@@ -3,6 +3,7 @@
    ;; org.altlaw.jobs.pre.altcrawl
    org.altlaw.jobs.web.crawl
    org.altlaw.jobs.web.scrape
+   org.altlaw.jobs.web.request
    org.altlaw.jobs.pre.ohm1
    org.altlaw.jobs.pre.profed
    org.altlaw.jobs.analyze.graph
