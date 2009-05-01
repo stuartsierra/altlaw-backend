@@ -1,5 +1,6 @@
 (ns org.altlaw.load-all
   (:require 
+   org.altlaw.jobs.web.assignids
    org.altlaw.jobs.web.crawl
    org.altlaw.jobs.web.request
    org.altlaw.jobs.web.scrape
