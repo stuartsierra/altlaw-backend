@@ -56,7 +56,7 @@ class Ca1
       entry.add_link('text/html', BASE_URL + cells[1].at('a')['href'])
       entry.add_link('application/pdf', PDF_BASE + filename.sub('.01A', '-01A.pdf'))
       entry.add_link('application/vnd.wordperfect', WP_BASE + filename)
-      entry.add_link('docket', cells[2].inner_text.strip)
+      entry.dockets << cells[2].inner_text.strip
       name, appeal = parse_title(cells[3])
       entry.name = name
       entry.appeal_from = appeal
