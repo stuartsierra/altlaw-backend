@@ -1,6 +1,6 @@
 (ns org.altlaw.load-all
   (:require 
-   org.altlaw.jobs.pre.altcrawl
+   ;; org.altlaw.jobs.pre.altcrawl
    org.altlaw.jobs.pre.ohm1
    org.altlaw.jobs.pre.profed
    org.altlaw.jobs.analyze.graph
