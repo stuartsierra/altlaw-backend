@@ -15,6 +15,10 @@ class Ca1
     search_table(tables[1], receiver)
   end
 
+  def request
+    DownloadRequest.new(OPINIONS_URL)
+  end
+
   private
 
   BASE_URL = 'http://www.ca1.uscourts.gov'
