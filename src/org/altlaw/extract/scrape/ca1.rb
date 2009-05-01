@@ -42,26 +42,25 @@ class Ca1
     tds = tbl.search('td')
     rows.length.times do
       cells = [tds.shift, tds.shift, tds.shift, tds.shift]
-      entry = {}
-      entry[:date] = parse_date(cells[0].inner_text.strip)
+      entry = Document.new
+      entry.date = parse_date(cells[0].inner_text.strip)
       filename = cells[1].at('a').inner_text.strip
       case parse_filename(filename)
       when :published
-        entry[:precedential] = true
+        entry.precedential = true
       when :unpublished
-        entry[:precedential] = false
+        entry.precedential = false
       when :errata
-        entry[:doctype] = :errata
+        entry.doctype = :errata
       end
-      entry[:links] = {}
-      entry[:links]['text/html'] =
-        BASE_URL + cells[1].at('a')['href']
-      entry[:links]['application/pdf'] =
-        PDF_BASE + filename.sub('.01A', '-01A.pdf')
-      entry[:links]['application/vnd.wordperfect'] = WP_BASE + filename
-      entry[:docket] = cells[2].inner_text.strip
-      entry[:name], entry[:appeal_from] = parse_title(cells[3])
-      entry[:court] = "http://id.altlaw.org/courts/us/fed/app/1"
+      entry.add_link('text/html', BASE_URL + cells[1].at('a')['href'])
+      entry.add_link('application/pdf', PDF_BASE + filename.sub('.01A', '-01A.pdf'))
+      entry.add_link('application/vnd.wordperfect', WP_BASE + filename)
+      entry.add_link('docket', cells[2].inner_text.strip)
+      name, appeal = parse_title(cells[3])
+      entry.name = name
+      entry.appeal_from = appeal
+      entry.court = "http://id.altlaw.org/courts/us/fed/app/1"
       receiver << entry
     end
   end
