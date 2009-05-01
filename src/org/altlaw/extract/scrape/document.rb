@@ -26,11 +26,18 @@ class Document
     d
   end
 
-  def to_json(*a)
+  def to_hash
     hash = {}
     FIELDS.each do |key|
-      hash[key] = self.send(key)
+      value = self.send(key)
+      if value
+        hash[key] = self.send(key)
+      end
     end
-    hash.to_json(*a)
+    hash
+  end
+
+  def to_json(*a)
+    self.to_hash.to_json(*a)
   end
 end
