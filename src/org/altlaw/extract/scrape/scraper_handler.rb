@@ -6,6 +6,7 @@ require 'org/altlaw/extract/scrape/download'
 require 'org/altlaw/extract/scrape/download_request'
 require 'org/altlaw/extract/scrape/expect'
 require 'org/altlaw/extract/scrape/ca1'
+require 'org/altlaw/extract/scrape/ca10'
 
 class Hash
   def stringify
@@ -23,7 +24,7 @@ end
 
 class ScraperHandler
 
-  SCRAPER_CLASSES = [Ca1]
+  SCRAPER_CLASSES = [Ca1, Ca10]
 
   def initialize
     @scrapers = {}
