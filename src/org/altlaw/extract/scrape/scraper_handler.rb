@@ -2,6 +2,7 @@ require 'rubygems'
 require 'hpricot'
 require 'date'
 
+require 'org/altlaw/extract/scrape/document'
 require 'org/altlaw/extract/scrape/download'
 require 'org/altlaw/extract/scrape/download_request'
 require 'org/altlaw/extract/scrape/expect'
@@ -9,16 +10,8 @@ require 'org/altlaw/extract/scrape/ca1'
 require 'org/altlaw/extract/scrape/ca10'
 
 class Hash
-  def stringify
-    inject({}) do |hash, (key, value)|
-      if value.instance_of?(Date)
-        value = value.to_s
-      elsif value.kind_of?(Hash)
-        value = value.stringify
-      end
-      hash[key.to_s] = value
-      hash
-    end
+  def to_hash
+    self
   end
 end
 
@@ -74,7 +67,7 @@ class ScraperHandler
     else
       results << { :exception =>  "No scrapers for #{host}"}
     end
-    results.map {|r| r.stringify}
+    results.map {|r| r.to_hash}
   end
 
   def parse_with(scraper, download)
