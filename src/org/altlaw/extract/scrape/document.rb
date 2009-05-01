@@ -12,7 +12,12 @@ class Document
     @dockets = []
     @citations = []
   end
-  
+
+  def add_link(mime_type, url)
+    @links[mime_type] ||= []
+    @links[mime_type] << url
+  end
+
   def self.from_json(json_string)
     d = self.new
     JSON.parse(json_string).each_pair do |key,value|
