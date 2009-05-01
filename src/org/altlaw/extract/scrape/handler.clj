@@ -12,7 +12,6 @@
 (defn run-scrapers [download]
   (assert (map? download))
   (assert (contains? download :request_uri))
-  (assert (contains? download :response_body_bytes))
   (map ruby/convert-jruby
        (ruby/eval-jruby "$handler.parse(Download.from_map($download))"
                         {:download (walk/stringify-keys download)
