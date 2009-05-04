@@ -1,4 +1,6 @@
 class Ca11
+  include Expect
+
   def accept_host
     'www.ca11.uscourts.gov'
   end
