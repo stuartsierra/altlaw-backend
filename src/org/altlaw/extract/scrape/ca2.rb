@@ -1,4 +1,6 @@
 class Ca2
+  include Expect
+
   def accept_host
     'www.ca2.uscourts.gov'
   end
@@ -40,8 +42,8 @@ class Ca2
 
   private
 
-  BASE_URL = 'http://www.ca2.uscourts.gov:8080'
-  OPINIONS_URL = BASE_URL + '/'
+  BASE_URL = 'http://www.ca2.uscourts.gov'
+  OPINIONS_URL = BASE_URL + '/decisions'
 
   def parse_page(download, is_precedent, receiver)
     html = download.response_body_as('US-ASCII')
@@ -83,7 +85,7 @@ class Ca2
       # Removing the fragment string ensures the URLs are valid and consistent.
       url.sub!(/#.+$/, '')
 
-      entry.links['application/pdf'] = url
+      entry.add_link('application/pdf', url)
       entry.dockets << cells[0].inner_text.strip
       entry.name = cells[1].inner_text
       entry.date = parse_date(cells[2].inner_text)
