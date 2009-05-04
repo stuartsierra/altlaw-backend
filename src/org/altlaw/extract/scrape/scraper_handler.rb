@@ -7,7 +7,9 @@ require 'org/altlaw/extract/scrape/download'
 require 'org/altlaw/extract/scrape/download_request'
 require 'org/altlaw/extract/scrape/expect'
 require 'org/altlaw/extract/scrape/ca1'
+require 'org/altlaw/extract/scrape/ca2'
 require 'org/altlaw/extract/scrape/ca10'
+require 'org/altlaw/extract/scrape/ca11'
 
 class Hash
   def to_hash
@@ -17,7 +19,7 @@ end
 
 class ScraperHandler
 
-  SCRAPER_CLASSES = [Ca1, Ca10]
+  SCRAPER_CLASSES = [Ca1, Ca2, Ca10, Ca11]
 
   def initialize
     @scrapers = {}
@@ -34,7 +36,12 @@ class ScraperHandler
     @scrapers.each do |host, scrapers|
       scrapers.each do |scraper|
         if req = scraper.request
-          requests << req.to_hash
+          if req.kind_of?(Array)
+            req.map!{|r| r.to_hash}
+            requests.concat(req)
+          else
+            requests << req.to_hash
+          end
         end
       end
     end
