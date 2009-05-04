@@ -72,11 +72,11 @@
   "Returns the response entity as a Base64-encoded string, or nil if
   no response entity."
   [response]
-  (when (.isAvailable (.. response getEntity))
-    (String. (Base64/encodeBase64Chunked
-              (IOUtils/toByteArray
-               (.. response getEntity getStream)))
-             "US-ASCII")))
+  (when-let [entity (.. response getEntity)]
+    (when (.isAvailable entity)
+     (String. (Base64/encodeBase64Chunked
+               (IOUtils/toByteArray (.getStream entity)))
+              "US-ASCII"))))
 
 (defn- headers-vec [message]
   (when (.. message getAttributes (get "org.restlet.http.headers"))
