@@ -3,7 +3,7 @@ class Document
   FIELDS = [:docid, :doctype, :name, :date, :files, :dockets,
   :citations, :court, :html, :text, :size, :incites, :outcites,
   :norobots, :removed, :precedential, :appeal_from, :subject, :author,
-  :abstract, :decided_by, :opinion_type, :links]
+  :abstract, :decided_by, :opinion_type, :links, :appeal_from_docket]
 
   attr_accessor(*FIELDS)
 
