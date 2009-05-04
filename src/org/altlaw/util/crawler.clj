@@ -1,5 +1,6 @@
 (ns org.altlaw.util.crawler
   (:require [org.altlaw.db.download-log :as dl]
+            [org.altlaw.util.log :as log]
             [clojure.contrib.singleton :as sing]
             [clojure.contrib.java-utils :as j])
   (:import (org.restlet Client Context)
@@ -10,7 +11,7 @@
 (defn- crawler-client-context []
   ;; Automatically follow HTTP redirects
   (doto (Context.)
-    (.. getParameters (add "followRedirects" "true"))))
+    (.. getParameters (add "followRedirects" "false"))))
 
 (def #^{:private true} crawler-http-client
      ;; Client is thread-safe.
@@ -98,6 +99,18 @@
   (merge (basic-response-map response)
          (extended-response-map response)))
 
+(declare handle-download-request)
+
+(defn- handle-redirect [result]
+  (let [code (:response_status_code result)
+        headers (into {} (:response_headers result))
+        location (get headers "Location")
+        original-request (select-keys result [:request_form_fields
+                                              :request_headers])
+        new-request (assoc original-request :request_uri location)]
+    (log/warn "HTTP response " code " to " (pr-str original-request))
+    (assoc (handle-download-request new-request) :redirect_from result)))
+
 (defn- execute-request
   "Calls the client to handle the request, logs the URL in the
   download log, and returns the download record as a keyword=>value
@@ -105,9 +118,12 @@
   [request]
   (let [response (.handle (crawler-http-client) request)
         result (merge (request-map request)
-                      (response-map response))]
+                      (response-map response))
+        code (:response_status_code result)]
     (dl/log-download (:request_uri result))
-    result))
+    (if (#{301 302 303 307} code)
+      (handle-redirect result)
+      result)))
 
 (defn crawl
   "Given a URL, downloads it and returns a download record as a
