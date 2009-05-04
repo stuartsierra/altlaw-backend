@@ -55,5 +55,7 @@
     (.setReducerClass job org.altlaw.jobs.web.assignids_reducer)
     (.setNumReduceTasks job 1)
     (.setJobName job "web.assignids")
+    (.setInputFormat job KeyValueTextInputFormat)
+    (.setOutputFormat job TextOutputFormat)
     (JobClient/runJob job))
   0)
