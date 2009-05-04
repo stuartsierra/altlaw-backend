@@ -3,8 +3,13 @@ class DownloadRequest
 
   attr_accessor(*FIELDS)
 
-  def initialize(uri)
+  def initialize(uri, form_fields = nil)
     @request_uri = uri
+    if form_fields
+      form_fields.each do |name, value|
+        add_form_field(name, value)
+      end
+    end
   end
 
   def add_form_field(name, value)
