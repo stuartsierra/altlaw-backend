@@ -28,7 +28,12 @@
   (let [form (Form.)]
     (doseq [[key value] fields]
       (.add form (j/as-str key) (j/as-str value)))
-    (.getWebRepresentation form)))
+    (let [entity (.getWebRepresentation form)]
+      ;; Some servers (e.g. the IIS server at www.ca2.uscourts.gov)
+      ;; don't accept POST requests with a "charset=" attribute in the
+      ;; "Content-Type" header, so set charset to null.
+      (.setCharacterSet entity nil)
+      entity)))
 
 (defn- set-client-agent [request]
   (.. request getClientInfo
@@ -72,7 +77,7 @@
   "Returns the response entity as a Base64-encoded string, or nil if
   no response entity."
   [response]
-  (when-let [entity (.. response getEntity)]
+  (when-let [entity (.getEntity response)]
     (when (.isAvailable entity)
      (String. (Base64/encodeBase64Chunked
                (IOUtils/toByteArray (.getStream entity)))
@@ -106,9 +111,10 @@
         headers (into {} (:response_headers result))
         location (get headers "Location")
         original-request (select-keys result [:request_form_fields
-                                              :request_headers])
+                                              :request_headers :request_uri])
         new-request (assoc original-request :request_uri location)]
-    (log/warn "HTTP response " code " to " (pr-str original-request))
+    (log/info "HTTP response " code " to " (pr-str original-request))
+    (log/info "Redirecting to " location)
     (assoc (handle-download-request new-request) :redirect_from result)))
 
 (defn- execute-request
