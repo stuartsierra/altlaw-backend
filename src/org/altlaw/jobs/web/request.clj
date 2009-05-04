@@ -23,10 +23,16 @@
     (filter identity
             (map check-downloaded (all-links record)))))
 
+(defn my-reduce [request nils]
+  (h/counter "Link URLs" "Requested after removing duplicates")
+  [[request nil]])
+
 (defn mapper-configure [this jobconf]
   (context/use-hadoop-jobconf jobconf))
 
 (def mapper-map (partial h/standard-map my-map))
+
+(def reducer-reduce (partial h/standard-reduce my-reduce))
 
 (defn tool-run [this args]
   (let [job (h/default-jobconf this)
@@ -38,8 +44,8 @@
     (FileOutputFormat/setOutputPath job outpath)
     (FileOutputFormat/setCompressOutput job false)
     (.setMapperClass job org.altlaw.jobs.web.request_mapper)
-    ;; (.setReducerClass job org.altlaw.jobs.web.request_reducer)
-    (.setNumReduceTasks job 0)
+    (.setReducerClass job org.altlaw.jobs.web.request_reducer)
+    (.setInputFormat job KeyValueTextInputFormat)
     (.setOutputFormat job TextOutputFormat)
     (.setJobName job "web.request")
     (JobClient/runJob job))
