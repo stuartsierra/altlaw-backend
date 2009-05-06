@@ -8,6 +8,11 @@ require 'org/altlaw/extract/scrape/download_request'
 require 'org/altlaw/extract/scrape/expect'
 require 'org/altlaw/extract/scrape/ca1'
 require 'org/altlaw/extract/scrape/ca2'
+require 'org/altlaw/extract/scrape/ca3'
+require 'org/altlaw/extract/scrape/ca4'
+require 'org/altlaw/extract/scrape/ca5'
+require 'org/altlaw/extract/scrape/ca6'
+require 'org/altlaw/extract/scrape/ca7'
 require 'org/altlaw/extract/scrape/ca10'
 require 'org/altlaw/extract/scrape/ca11'
 
@@ -19,7 +24,7 @@ end
 
 class ScraperHandler
 
-  SCRAPER_CLASSES = [Ca1, Ca2, Ca10, Ca11]
+  SCRAPER_CLASSES = [Ca1, Ca2, Ca3, Ca4, Ca5, Ca6, Ca7, Ca10, Ca11]
 
   def initialize
     @scrapers = {}
