@@ -20,7 +20,7 @@ class Ca4
   private
 
   BASE_URL = 'http://pacer.ca4.uscourts.gov/'
-  OPINIONS_URL = BASE_URL + '/opinions_today.htm'
+  OPINIONS_URL = BASE_URL + 'opinions_today.htm'
 
   def find_opinions(download, receiver)
     html = download.response_body_as('US-ASCII')
