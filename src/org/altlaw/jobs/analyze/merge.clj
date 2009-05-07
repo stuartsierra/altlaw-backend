@@ -33,6 +33,7 @@
     (.setJobName job "merge")
     (FileInputFormat/setInputPaths job (str (h/job-path :pre :profed)
                                             "," (h/job-path :pre :ohm1)
+                                            "," (h/job-path :web :merge)
                                             "," (h/job-path :analyze :cite_fields)))
     (FileOutputFormat/setOutputPath job outpath)
     (.delete hdfs outpath true)

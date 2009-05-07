@@ -69,7 +69,8 @@
         hdfs (FileSystem/get job)]
     (.setJobName job "graph")
     (FileInputFormat/setInputPaths job (str (h/job-path :pre :profed)
-                                            "," (h/job-path :pre :ohm1)))
+                                            "," (h/job-path :pre :ohm1)
+                                            "," (h/job-path :web :merge)))
     (FileOutputFormat/setOutputPath job outpath)
     (.delete hdfs outpath true)
     (.setMapperClass job org.altlaw.jobs.analyze.graph_mapper)
