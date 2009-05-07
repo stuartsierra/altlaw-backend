@@ -91,11 +91,11 @@
 (defn standard-map [map-fn this wkey wvalue output reporter]
   (let [key (read-string (str wkey))
         value (read-string (str wvalue))]
-    (log/debug "Mapper input: " (pr-str key)
+    (log/debug "Mapper input: " (log/logstr key)
                " => " (log/logstr value))
     (binding [*reporter* reporter]
       (doseq [[key value] (map-fn key value)]
-        (log/debug "Mapper OUTPUT: " (pr-str key)
+        (log/debug "Mapper OUTPUT: " (log/logstr key)
                    " => " (log/logstr value))
         (.collect output (Text. (pr-str key))
                   (Text. (pr-str value)))))))
