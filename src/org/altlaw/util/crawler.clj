@@ -106,15 +106,11 @@
 
 (declare handle-download-request)
 
-(defn- handle-redirect [result]
+(defn- handle-redirect [result new-location]
   (let [code (:response_status_code result)
-        headers (into {} (:response_headers result))
-        location (get headers "Location")
-        original-request (select-keys result [:request_form_fields
-                                              :request_headers :request_uri])
-        new-request (assoc original-request :request_uri location)]
-    (log/info "HTTP response " code " to " (pr-str original-request))
-    (log/info "Redirecting to " location)
+        new-request {:request_uri new-location}]
+    (log/info "Got HTTP redirect for " (pr-str result))
+    (log/info "Redirecting to " new-location)
     (assoc (handle-download-request new-request) :redirect_from result)))
 
 (defn- execute-request
@@ -126,9 +122,11 @@
         result (merge (request-map request)
                       (response-map response))
         code (:response_status_code result)]
-    (dl/log-download (:request_uri result))
+    ;; Only log URL on success or NOT FOUND
+    (when (#{200 404} code) 
+      (dl/log-download (:request_uri result)))
     (if (#{301 302 303 307} code)
-      (handle-redirect result)
+      (handle-redirect result (str (.getLocationRef response)))
       result)))
 
 (defn crawl
