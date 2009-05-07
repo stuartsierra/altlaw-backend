@@ -42,6 +42,11 @@
   served via HTTP on www.altlaw.org" []
   (java.io.File. (str (altlaw-home) "/src/org/altlaw/www/static")))
 
+(defn content-storage-dir
+  "Root directory for large 'content' storage, files containing
+  arbitrary data." []
+  (java.io.File. (str (altlaw-home) "/var/content")))
+
 (defn solr-home 
   "Solr home directory for running Solr instances."
   []
