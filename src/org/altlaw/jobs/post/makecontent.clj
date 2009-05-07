@@ -1,4 +1,4 @@
-(ns org.altlaw.jobs.post.content
+(ns org.altlaw.jobs.post.makecontent
   (:require [org.altlaw.util.hadoop :as h]
             [org.altlaw.util.log :as log]
             [org.altlaw.util.context :as context]
@@ -27,7 +27,7 @@
     (FileInputFormat/setInputPaths job (h/job-path :analyze :merge))
     (FileOutputFormat/setOutputPath job outpath)
     (.delete (FileSystem/get job) outpath true)
-    (.setMapperClass job org.altlaw.jobs.post.content_mapper)
+    (.setMapperClass job org.altlaw.jobs.post.makecontent_mapper)
     (.setReducerClass job IdentityReducer)
     (JobClient/runJob job))
   0)
