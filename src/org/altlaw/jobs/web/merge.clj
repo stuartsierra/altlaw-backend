@@ -23,7 +23,7 @@
 (defn map-document [document]
   (let [links (all-links document)]
     (if-let [docid (some #(ids/get-docid "altcrawl" %) (all-links document))]
-      [[docid (assoc document :docid docid)]]
+      [[docid (assoc document :docid docid :doctype "case")]]
       (do (log/warn "Missing docid for " links)
           (h/counter "Missing docid")
           nil))))
@@ -33,7 +33,7 @@
     (let [download (decode-response-body download)
           html (Anonymizer/filter (pdf/pdf-to-html (str docid) (:response_body_bytes download)))
           text (PROHTMLToText/filter html)]
-      [[docid {:docid docid :html html :text text}]])
+      [[docid {:docid docid :html html :text text :doctype "case"}]])
     (do (log/warn "Missing docid for " (:request_uri download))
         (h/counter "Missing docid")
         nil)))
