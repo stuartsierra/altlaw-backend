@@ -12,7 +12,7 @@
    org.altlaw.jobs.analyze.cite_fields
    org.altlaw.jobs.analyze.merge
    org.altlaw.jobs.post.distindex
-   org.altlaw.jobs.post.savecontent
+   org.altlaw.jobs.post.makecontent
 
    org.altlaw.test.run
    org.altlaw.test.www
@@ -23,6 +23,7 @@
    org.altlaw.util.files
    org.altlaw.util.hadoop
    org.altlaw.util.hadoop.SeqFileToFiles
+   org.altlaw.util.hadoop.SeqFileTextToFiles
    org.altlaw.util.log
    org.altlaw.util.lucene
    org.altlaw.util.markdown
