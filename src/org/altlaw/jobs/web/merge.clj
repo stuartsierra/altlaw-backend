@@ -42,7 +42,7 @@
   (cond
     (= key :document) (map-document value)
     (map? key) (map-download key)
-    :else (do (log/warn "Unrecognized record type " (pr-str key) " => " (pr-str value))
+    :else (do (log/warn "Unrecognized record type " (log/logstr key) " => " (log/logstr value))
               (h/counter "Unrecognized record types")
               nil)))
 
