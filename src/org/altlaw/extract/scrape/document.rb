@@ -4,7 +4,7 @@ class Document
   :citations, :court, :html, :text, :size, :incites, :outcites,
   :norobots, :removed, :precedential, :appeal_from, :subject, :author,
   :abstract, :decided_by, :opinion_type, :links, :appeal_from_docket,
-  :description]
+  :description, :immediate_filing]
 
   attr_accessor(*FIELDS)
 
