@@ -17,6 +17,9 @@ require 'org/altlaw/extract/scrape/ca8'
 require 'org/altlaw/extract/scrape/ca9'
 require 'org/altlaw/extract/scrape/ca10'
 require 'org/altlaw/extract/scrape/ca11'
+require 'org/altlaw/extract/scrape/cafc'
+require 'org/altlaw/extract/scrape/cadc'
+require 'org/altlaw/extract/scrape/sct'
 
 class Hash
   def to_hash
@@ -26,8 +29,8 @@ end
 
 class ScraperHandler
 
-  SCRAPER_CLASSES = [Ca1, Ca2, Ca3, Ca4, Ca5, Ca6, Ca7,
-                     Ca8, Ca9, Ca10, Ca11]
+  SCRAPER_CLASSES = [Ca1, Ca2, Ca3, Ca4, Ca5, Ca6, Ca7, Ca8,
+                     Ca9, Ca10, Ca11, Cafc, Cadc, Sct]
 
   def initialize
     @scrapers = {}

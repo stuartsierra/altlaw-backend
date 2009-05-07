@@ -4,7 +4,8 @@ class Document
   :citations, :court, :html, :text, :size, :incites, :outcites,
   :norobots, :removed, :precedential, :appeal_from, :subject, :author,
   :abstract, :decided_by, :opinion_type, :links, :appeal_from_docket,
-  :description, :immediate_filing]
+  :description, :immediate_filing, :reporter_part, :sequence_number,
+  :opinion_by]
 
   attr_accessor(*FIELDS)
 
