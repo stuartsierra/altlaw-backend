@@ -1,6 +1,9 @@
 (ns org.altlaw.db.content
-  (:require [org.altlaw.util.s3 :as s3])
-  (:import (org.apache.commons.codec.digest DigestUtils)))
+  (:require [org.altlaw.util.s3 :as s3]
+            [org.altlaw.util.context :as context])
+  (:import (org.apache.commons.codec.digest DigestUtils)
+           (org.apache.commons.io FileUtils)
+           (java.io File)))
 
 (def #^{:private true} *bucket* "content.altlaw.org")
 
@@ -34,9 +37,15 @@
        *bucket* key content metadata))
     hash))
 
+(defn- get-content-string-from-file [key]
+  (let [path (File. (context/content-storage-dir) key)]
+    (when (.exists path)
+      (FileUtils/readFileToString path "UTF-8"))))
+
 (defn get-content-string [hash]
   (let [key (str "sha1/" hash)]
-    (s3/get-object-string *bucket* key)))
+    (or (get-content-string-from-file key)
+        (s3/get-object-string *bucket* key))))
 
 (defn get-content-bytes [hash]
   (let [key (str "sha1/" hash)]
