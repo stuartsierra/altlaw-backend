@@ -36,9 +36,11 @@
   (let [download (decode-response-body download)
         type (mime-type download)]
     (h/counter "MIME Types" type)
-    (when (= type "text/html")
+    (if (= type "text/html")
       (map handle-scraper-result
-           (handler/run-scrapers download)))))
+           (handler/run-scrapers download))
+      (do (log/debug "Ignoring MIME type " type)
+          nil))))
 
 (def mapper-map (partial h/standard-map my-map))
 
