@@ -127,11 +127,11 @@
 (defn standard-reduce [reduce-fn this wkey wvalues-iter output reporter]
   (let [key (read-string (str wkey))
         values (map #(read-string (str %)) (iterator-seq wvalues-iter))]
-    (log/debug "Reducer input: " (pr-str key)
+    (log/debug "Reducer input: " (log/logstr key)
                " => " (log/logstr values))
     (binding [*reporter* reporter]
       (doseq [[key value] (reduce-fn key values)]
-        (log/debug "Reducer OUTPUT: " (pr-str key)
+        (log/debug "Reducer OUTPUT: " (log/logstr key)
                    " => " (log/logstr value))
         (.collect output (Text. (pr-str key))
                   (Text. (pr-str value)))))))
