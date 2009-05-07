@@ -6,7 +6,7 @@ class Ca9
   end
 
   def accept?(download)
-    download.request_uri = OPINIONS_URL or
+    download.request_uri == OPINIONS_URL or
       download.request_uri =~ SUBPAGE_REGEX
   end
 
@@ -77,7 +77,7 @@ class Ca9
     return if titlestring =~ /NO OPINIONS FILED TODAY/
     titlestring.sub!('Opinion for', '')
     titleparts = titlestring.split(',')
-    entry.docket = titleparts.pop.strip
+    entry.dockets << titleparts.pop.strip
     entry.name = titleparts.join(',').strip
 
     unless datatable = doc.at('div#bd div#yui-main div.yui-b table[2]')
@@ -85,16 +85,16 @@ class Ca9
     end
     rows = datatable.search('tr')
 
-    check_equal(rows[0].at('td[1]').inner_text, 'Case Number:')
-    entry.docket = rows[0].at('td[2]').inner_text
+    match(rows[0].at('td[1]').inner_text, 'Case Number:')
+    entry.dockets << rows[0].at('td[2]').inner_text
 
-    check_equal(rows[1].at('td[1]').inner_text, 'Immediate Filing:')
+    match(rows[1].at('td[1]').inner_text, 'Immediate Filing:')
     entry.immediate_filing = (rows[1].at('td[2]').inner_text == 'yes')
 
-    check_equal(rows[2].at('td[1]').inner_text, 'Case Type:')
+    match(rows[2].at('td[1]').inner_text, 'Case Type:')
     entry.subject = rows[2].at('td[2]').inner_text
 
-    check_equal(rows[3].at('td[1]').inner_text, 'Case Code:')
+    match(rows[3].at('td[1]').inner_text, 'Case Code:')
     entry.opinion_type = OPINION_TYPES[rows[3].at('td[2]').inner_text]
 
     unless iframe = doc.at("iframe#view_opinion")
