@@ -41,3 +41,7 @@
   [url]
   (assert (string? url))
   (contains? @(get-download-log) url))
+
+(defn set-not-downloaded [url]
+  (assert (string? url))
+  (dosync (alter (get-download-log) dissoc url)))
