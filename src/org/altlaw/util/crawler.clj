@@ -117,9 +117,8 @@
     (recur redirect)))
 
 (defn- execute-request
-  "Calls the client to handle the request, logs the URL in the
-  download log, and returns the download record as a keyword=>value
-  map."
+  "Calls the client to handle the Request object and returns the
+  download record as a keyword=>value map."
   [request]
   (let [response (.handle (crawler-http-client) request)
         result (merge (request-map request)
