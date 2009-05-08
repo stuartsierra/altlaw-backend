@@ -104,14 +104,17 @@
   (merge (basic-response-map response)
          (extended-response-map response)))
 
-(declare handle-download-request)
+(declare crawl)
 
 (defn- handle-redirect [result new-location]
-  (let [code (:response_status_code result)
-        new-request {:request_uri new-location}]
-    (log/info "Got HTTP redirect for " (pr-str result))
-    (log/info "Redirecting to " new-location)
-    (assoc (handle-download-request new-request) :redirect_from result)))
+  (log/info "Got HTTP redirect for " (pr-str result))
+  (log/info "Redirecting to " new-location)
+  (assoc (crawl new-location) :redirect_from result))
+
+(defn- log-downloaded [download]
+  (dl/log-download (:request_uri download))
+  (when-let [redirect (:redirect_from download)]
+    (recur redirect)))
 
 (defn- execute-request
   "Calls the client to handle the request, logs the URL in the
@@ -122,12 +125,15 @@
         result (merge (request-map request)
                       (response-map response))
         code (:response_status_code result)]
-    ;; Only log URL on success or NOT FOUND
-    (when (#{200 404} code) 
-      (dl/log-download (:request_uri result)))
     (if (#{301 302 303 307} code)
       (handle-redirect result (str (.getLocationRef response)))
       result)))
+
+(defn- log-result [result]
+  (let [code (:response_status_code result)]
+    ;; Only log URL on success or NOT FOUND
+    (when (#{200 404} code) (log-downloaded result))
+    result))
 
 (defn crawl
   "Given a URL, downloads it and returns a download record as a
@@ -135,9 +141,9 @@
   parameters.  Logs the URL in the download log, but does not save the
   download log."
   ([url]
-     (execute-request (make-request url)))
+     (log-result (execute-request (make-request url))))
   ([url form-fields]
-     (execute-request (make-request url form-fields))))
+     (log-result (execute-request (make-request url form-fields)))))
 
 (defn handle-download-request
   "Given a partial download record as a keyword=>value map, runs
