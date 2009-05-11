@@ -40,6 +40,7 @@
       (map handle-scraper-result
            (handler/run-scrapers download))
       (do (log/debug "Ignoring MIME type " type)
+          (h/report-progress)
           nil))))
 
 (def mapper-map (partial h/standard-map my-map))
