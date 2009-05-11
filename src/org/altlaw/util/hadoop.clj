@@ -27,6 +27,9 @@
   ([group counter-name]
      (.incrCounter *reporter* (str group) (str counter-name) 1)))
 
+(defn report-progress []
+  (.progress *reporter*))
+
 (defn default-jobconf [this]
   (let [conf (.getConf this)
         job (JobConf. conf (.getClass this))]
