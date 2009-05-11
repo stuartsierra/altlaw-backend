@@ -2,10 +2,10 @@
   (:require 
    org.altlaw.jobs.web.assignids
    org.altlaw.jobs.web.crawl
+   org.altlaw.jobs.web.files
    org.altlaw.jobs.web.merge
-   org.altlaw.jobs.web.request
    org.altlaw.jobs.web.scrape
-   org.altlaw.jobs.web.spider
+   org.altlaw.jobs.web.seed
    org.altlaw.jobs.pre.ohm1
    org.altlaw.jobs.pre.profed
    org.altlaw.jobs.analyze.graph

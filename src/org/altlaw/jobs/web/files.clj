@@ -1,4 +1,4 @@
-(ns org.altlaw.jobs.web.request
+(ns org.altlaw.jobs.web.files
   (:require [org.altlaw.util.crawler :as crawler]
             [org.altlaw.db.download-log :as dl]
             [org.altlaw.util.log :as log]
@@ -43,10 +43,10 @@
     (FileInputFormat/setInputPaths job (str inpath))
     (FileOutputFormat/setOutputPath job outpath)
     (FileOutputFormat/setCompressOutput job false)
-    (.setMapperClass job org.altlaw.jobs.web.request_mapper)
-    (.setReducerClass job org.altlaw.jobs.web.request_reducer)
+    (.setMapperClass job org.altlaw.jobs.web.files_mapper)
+    (.setReducerClass job org.altlaw.jobs.web.files_reducer)
     (.setInputFormat job KeyValueTextInputFormat)
     (.setOutputFormat job TextOutputFormat)
-    (.setJobName job "web.request")
+    (.setJobName job "web.files")
     (JobClient/runJob job))
   0)

@@ -1,4 +1,4 @@
-(ns org.altlaw.jobs.web.spider
+(ns org.altlaw.jobs.web.seed
   (:require [org.altlaw.util.hadoop :as h]
             [org.altlaw.extract.scrape.handler :as handler]
             [clojure.contrib.duck-streams :as duck]))
