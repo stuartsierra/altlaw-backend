@@ -1,4 +1,4 @@
-(ns org.altlaw.jobs.util.hadoop.SeqFileTextToFiles
+(ns org.altlaw.util.hadoop.SeqFileTextToFiles
   (:gen-class)
   (:import (org.altlaw.util.hadoop LocalSetup) 
            (org.apache.hadoop.io Text SequenceFile$Reader)
