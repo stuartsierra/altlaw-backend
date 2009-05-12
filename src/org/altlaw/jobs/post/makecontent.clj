@@ -16,9 +16,10 @@
         nil)))
 
 (defn mapper-map [this wkey wvalue output reporter]
-  (let [[key value] (my-map (read-string (str wkey))
-                            (read-string (str wvalue)))]
-    (.collect output (Text. key) (Text. value))))
+  (binding [h/*reporter* reporter]
+   (let [[key value] (my-map (read-string (str wkey))
+                             (read-string (str wvalue)))]
+     (.collect output (Text. key) (Text. value)))))
 
 (defn tool-run [this args]
   (let [job (h/default-jobconf this)
