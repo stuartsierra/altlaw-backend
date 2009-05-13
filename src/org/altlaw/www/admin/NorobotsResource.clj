@@ -1,6 +1,7 @@
 (ns org.altlaw.www.admin.NorobotsResource
   (:gen-class :extends org.restlet.resource.Resource)
-  (:require [org.altlaw.db.privacy :as privacy])
+  (:require [org.altlaw.db.privacy :as privacy]
+            [org.altlaw.www.render :as rend])
   (:import (org.restlet.resource Variant StringRepresentation ResourceException)
            (org.restlet.data Form MediaType Language CharacterSet Reference Status)))
 
@@ -22,30 +23,12 @@
       (privacy/add-norobots [docid])
       (privacy/save-norobots)
       (.. this getResponse
-          (setEntity (StringRepresentation.
-(str "<html><head><title>Docid No Robots</title></head>
-<body>
-<h1>Docid No Robots</h1>
-<p>Docid " docid " added to norobots.</p>
-</body></html>")
-                      MediaType/TEXT_HTML
-                      Language/ENGLISH_US
-                      CharacterSet/UTF_8))))))
+          (redirectSeeOther (.. this getRequest getOriginalRef))))))
 
 (defn -represent [this variant]
   (StringRepresentation.
-   (str
-"<html><head><title>Docid No Robots</title></head>
-<body>
-<h1>Docid No Robots</h1>
-<form method=\"post\">
-<p><label for=\"docid\">Add new norobots Docid</label>
-<input name=\"docid\" type=\"text\" size=\"10\" />
-<p><input type=\"submit\" value=\"Submit\" /></p>
-</p></form>
-<h2>Current norobots:</h2>
-<p>" (sort @(privacy/get-norobots)) "</p>
-</body></html>")
+   (rend/render "admin/norobots"
+                :norobots (sort @(privacy/get-norobots)))
    MediaType/TEXT_HTML
    Language/ENGLISH_US
    CharacterSet/UTF_8))
