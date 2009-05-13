@@ -2,8 +2,6 @@
   (:gen-class :extends org.restlet.Application
               :exposes-methods {start superStart
                                 stop superStop})
-  (:import (org.restlet Router Guard)
-           (org.restlet.data ChallengeScheme))
   (:require org.altlaw.www.StaticFinder
             org.altlaw.www.CiteFinder
             org.altlaw.www.AllCasesFinder
@@ -12,8 +10,10 @@
             org.altlaw.www.AdminNorobotsResource
             org.altlaw.www.DocResource
             org.altlaw.www.content-pages
+            [org.altlaw.www.admin :as admin]
             [org.altlaw.util.context :as context]
-            [org.altlaw.util.solr :as solr]))
+            [org.altlaw.util.solr :as solr])
+  (:import (org.restlet Router)))
 
 (defn -start [this]
   (let [context (.getContext this)
@@ -36,13 +36,6 @@
     (.info logger (str "Stopping www application."))
     (.. context getAttributes (get "org.altlaw.solr.core") close)))
 
-(defn make-admin-guard [context next]
-  (doto (Guard. context ChallengeScheme/HTTP_DIGEST
-                "AltLaw admin")
-    (.. getSecrets (put (context/admin-username)
-                        (.toCharArray (context/admin-password))))
-    (.setNext next)))
-
 (defn -createRoot [this]
   (let [context (.getContext this)
         static-finder (new org.altlaw.www.StaticFinder context)]
@@ -53,5 +46,5 @@
       (.attach "/v1/search" org.altlaw.www.SearchResource)
       (.attach "/v1/cases/{docid}/citations" org.altlaw.www.CitationsResource)
       (.attach "/v1/cases/{docid}" org.altlaw.www.DocResource)
-      (.attach "/admin/norobots" (make-admin-guard context org.altlaw.www.AdminNorobotsResource))
+      (.attach "/admin" (admin/make-guarded-admin-router context))
       (.attach static-finder))))
