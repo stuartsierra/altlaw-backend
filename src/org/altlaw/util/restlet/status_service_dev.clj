@@ -1,10 +1,12 @@
 (ns org.altlaw.util.restlet.status-service-dev
+  (:require [org.altlaw.util.restlet.error-log :as errlog])
   (:gen-class :extends org.restlet.service.StatusService)
   (:import (org.restlet.data Status MediaType)
            (org.restlet.resource StringRepresentation)))
 
 (defn -getRepresentation [this status request response]
   (when (.isError status)
+    (errlog/log-error-status status)
     (StringRepresentation.
      (with-out-str
        (print "HTTP" (.getCode status) (.getName status) "\n\n")
