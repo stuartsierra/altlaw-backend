@@ -17,7 +17,7 @@
       "Converts a String date from YYYY-MM-DD format to 
       'January 1, 2009' format."
       [string]
-      (when string
+      (when (seq string)
         (str (.format *long-date-format*
                       (.parse *iso-date-format* string
                               (ParsePosition. 0))
