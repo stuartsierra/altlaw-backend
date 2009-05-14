@@ -23,7 +23,8 @@
                               (ParsePosition. 0))
                       (StringBuffer.)
                       (FieldPosition. 0)))))
-  (is (= "January 1, 2009" (format-long-date "2009-01-01"))))
+  (is (= "January 1, 2009" (format-long-date "2009-01-01")))
+  (is (= nil (format-long-date ""))))
 
 (defn filename-timestamp []
   (.format *datetime-filename-format* (Date.)))
