@@ -12,6 +12,11 @@ For more information, see [About This Site](/v1/about)
 
 ## News and Announcements
 
+* **Thursday, May 28, 2009:** Updates are happening!  Take a look at
+the [list of cases](/v1/cases) and you'll see opinions that were
+released earlier this week.  We still have a back-log of updates from
+the past few months, those will be added to the database soon.
+
 * **Monday, April 27, 2009:** New!  We've added "snippets" of text from
 each case in the search results!  [Check it out](/v1/search?q=computer), and 
 [let us know](/v1/about/feedback) what you think.
