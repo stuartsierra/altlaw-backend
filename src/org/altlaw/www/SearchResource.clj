@@ -26,46 +26,6 @@
 
 ;;; PAGE NUMBERING
 
-(def *page-size* 10)
-
-(def *window-size* 5)
-
-(defn page-ref [ref number]
-  (let [newref (Reference. ref)
-        query (.getQueryAsForm newref)]
-    (.set query "page" (str number) true)
-    (.setQuery newref (.encode query))
-    newref))
-
-(defn pagination-html [ref current total-hits]
-  (let [last-page (int (Math/ceil (/ total-hits (float *page-size*))))
-        window-start (if (< (- current *window-size*) 1)
-                       1 (- current *window-size*))
-        window-end (if (> (+ current *window-size*) last-page)
-                     last-page (+ current *window-size*))]
-    (with-out-str
-      (print "<div class=\"pagination\"><ul>")
-      (print "<li>Pages:</li>")
-      (if (= current 1)
-        (print "<li class=\"disablepage\">&#171; previous</li>")
-        (printf "<li class=\"prevpage\"><a href=\"%s\">&#171; previous</a></li>"
-                (str (page-ref ref (dec current)))))
-      (when (not= window-start 1)
-        (printf "<li><a href=\"%s\">1</a></li>" (str (page-ref ref 1)))
-        (print "<li>...</li>"))
-      (doseq [n (range window-start (inc window-end))]
-        (if (= n current)
-          (printf "<li class=\"currentpage\">%d</li>" n)
-          (printf "<li><a href=\"%s\">%d</a></li>" (str (page-ref ref n)) n)))
-      (when (not= window-end last-page)
-        (print "<li>...</li>")
-        (printf "<li><a href=\"%s\">%d</a></li>"
-                (str (page-ref ref last-page)) last-page))
-      (if (= current last-page)
-        (print "<li class=\"disablepage\">next &#187;</li>")
-        (printf "<li class=\"prevpage\"><a href=\"%s\">next &#187;</a></li>"
-                (str (page-ref ref (inc current)))))
-      (print "</ul></div>"))))
 
 ;;; RENDERING RESULTS
 
@@ -99,16 +59,6 @@
      :hits (map (partial prepare-hit (.getHighlighting solr-response))
                 docs)}))
 
-(defn html-exception [data]
-  (tmpl/render "search/error_page"
-               :error_message
-               (if (= "development" (context/altlaw-env))
-                 (with-out-str
-                   (print "<pre>")
-                   (stacktrace/print-cause-trace (:exception data) 15)
-                   (print "</pre>"))
-                 (.getMessage (stacktrace/root-cause (:exception data))))))
-
 (defn html-results [ref data]
   (let [params (.. ref getQueryAsForm getValuesMap)
         current-page (Integer/parseInt (or (get params "page") "1"))
@@ -117,21 +67,11 @@
     (tmpl/render "search/html_results"
                  (assoc data :pagination pagination))))
 
-(defn html-no-results [data]
-  (tmpl/render "search/html_no_results" data))
-
 (defn order-for-display [sort]
   (cond
    (= sort "score desc") "relevance"
    (= sort "date desc") "date"
    :else "unknown order"))
-
-(defn sort-ref [ref sort]
-  (let [newref (Reference. ref)
-        query (.getQueryAsForm newref)]
-    (.set query "sort" sort true)
-    (.setQuery newref (.encode query))
-    newref))
 
 (defn make-sortlinks [ref sort]
   (cond
@@ -142,40 +82,37 @@
 
 (defmethod render-results MediaType/TEXT_HTML [this variant data]
   (let [ref (.. this getRequest getOriginalRef)
+        ;; Do not display "relevance" sort link when using 'all' query
         data (if (= (:query data) "docid:[* TO *]")
                data
                (assoc data
                  :order (order-for-display (:sort data))
                  :sortlinks (make-sortlinks ref (:sort data))))]
     (StringRepresentation.
-     (cond
-      (contains? data :exception) (html-exception data)
-      (zero? (:total_hits data)) (html-no-results data)
-      :else (html-results ref data))
+     (html-results ref data)
      MediaType/TEXT_HTML
      Language/ENGLISH_US
      CharacterSet/UTF_8)))
 
 
-(defn render-no-results [this variant prepared]
+;;; RENDERING EMPTY RESULT SET
+
+(defmulti render-no-results
+  (fn [this variant prepared] (.getMediaType variant)))
+
+(defmethod render-no-results MediaType/TEXT_HTML [this variant prepared]
   (StringRepresentation.
-   (html-no-results prepared)
-     MediaType/TEXT_HTML
-     Language/ENGLISH_US
-     CharacterSet/UTF_8))
+   (tmpl/render "search/html_no_results" prepared)
+   MediaType/TEXT_HTML
+   Language/ENGLISH_US
+   CharacterSet/UTF_8))
 
 
 ;;; RENDERING BLANK FORMS
 
-(defn html-form [query-type]
-  (tmpl/render (str "search/" (name query-type) "_search_page")))
-
-
-(defmulti render-blank-form (fn [this variant search-type] (.getMediaType variant)))
-
-(defmethod render-blank-form MediaType/TEXT_HTML [this variant search-type]
+(defn render-blank-form [this variant search-type]
   (StringRepresentation.
-   (html-form search-type)
+   (tmpl/render (str "search/" (name search-type) "_search_page"))
    MediaType/TEXT_HTML
    Language/ENGLISH_US
    CharacterSet/UTF_8))
@@ -183,9 +120,17 @@
 
 ;;; RENDERING EXCEPTIONS
 
-(defmulti render-exception (fn [this variant data] (.getMediaType variant)))
+(defn html-exception [data]
+  (tmpl/render "search/error_page"
+               :error_message
+               (if (= "development" (context/altlaw-env))
+                 (with-out-str
+                   (print "<pre>")
+                   (stacktrace/print-cause-trace (:exception data) 15)
+                   (print "</pre>"))
+                 (.getMessage (stacktrace/root-cause (:exception data))))))
 
-(defmethod render-exception MediaType/TEXT_HTML [this variant data]
+(defn render-exception MediaType/TEXT_HTML [this variant data]
   (StringRepresentation.
    (html-exception data)
    MediaType/TEXT_HTML
@@ -432,7 +377,7 @@
 (defn -isModifiable [this] false)
 
 (defn -getVariants [this]
-  [(Variant. MediaType/TEXT_HTML)])
+  [(Variant. MediaType/TEXT_HTML) (Variant. MediaType/APPLICATION_ATOM_XML)])
 
 (defn -represent [this variant]
   (try
