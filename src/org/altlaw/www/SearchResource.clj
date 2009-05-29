@@ -1,5 +1,7 @@
 (ns org.altlaw.www.SearchResource
   (:require [org.altlaw.www.render :as tmpl]
+            [org.altlaw.www.references :as r]
+            [org.altlaw.www.pagination :as p]
             [org.altlaw.util.date :as date]
             [org.altlaw.util.courts :as courts]
             [org.altlaw.util.context :as context]
@@ -22,9 +24,6 @@
 
 (defn log [this & args]
   (.. this getContext getLogger (info (apply str args))))
-
-
-;;; PAGE NUMBERING
 
 
 ;;; RENDERING RESULTS
@@ -59,13 +58,11 @@
      :hits (map (partial prepare-hit (.getHighlighting solr-response))
                 docs)}))
 
-(defn html-results [ref data]
-  (let [params (.. ref getQueryAsForm getValuesMap)
-        current-page (Integer/parseInt (or (get params "page") "1"))
-        pagination (when (> (:total_hits data) *page-size*)
-                     (pagination-html ref current-page (:total_hits data)))]
-    (tmpl/render "search/html_results"
-                 (assoc data :pagination pagination))))
+(defn get-current-page [ref]
+  (let [params (.. ref getQueryAsForm getValuesMap)]
+    (if-let [p (get params "page")]
+      (Integer/parseInt p)
+      1)))
 
 (defn order-for-display [sort]
   (cond
@@ -75,22 +72,66 @@
 
 (defn make-sortlinks [ref sort]
   (cond
-   (= sort "score desc") [{:url (sort-ref ref "date") :name "Sort by date"}]
-   (= sort "date desc") [{:url (sort-ref ref "relevance") :name "Sort by relevance"}]))
+   (= sort "score desc") [{:url (r/sort-ref ref "date") :name "Sort by date"}]
+   (= sort "date desc") [{:url (r/sort-ref ref "relevance") :name "Sort by relevance"}]))
+
+(defn prepare-atom-result-url [ref data]
+  (assoc data :atom_results_url
+         (tmpl/h (-> ref
+                     (r/page-ref 1)
+                     (r/format-ref "atom")
+                     (r/sort-ref "date")))))
+
+(defn prepare-html-template [ref data]
+  (let [data (prepare-atom-result-url ref data)]
+    ;; Do not display "relevance" sort link when using 'all' query
+    (if (= (:query data) "docid:[* TO *]")
+      data
+      (assoc data
+        :order (order-for-display (:sort data))
+        :sortlinks (make-sortlinks ref (:sort data))))))
+
+(defn html-results [ref data]
+  (let [data (prepare-html-template ref data)
+        current-page (get-current-page ref)
+        pagination (when (> (:total_hits data) p/*page-size*)
+                     (p/pagination-html ref current-page (:total_hits data)))]
+    (tmpl/render "search/html_results"
+                 (assoc data :pagination pagination
+                        :current_page current-page))))
 
 (defmulti render-results (fn [this variant data] (.getMediaType variant)))
 
 (defmethod render-results MediaType/TEXT_HTML [this variant data]
-  (let [ref (.. this getRequest getOriginalRef)
-        ;; Do not display "relevance" sort link when using 'all' query
-        data (if (= (:query data) "docid:[* TO *]")
-               data
-               (assoc data
-                 :order (order-for-display (:sort data))
-                 :sortlinks (make-sortlinks ref (:sort data))))]
+  (let [ref (.. this getRequest getOriginalRef)]
     (StringRepresentation.
      (html-results ref data)
      MediaType/TEXT_HTML
+     Language/ENGLISH_US
+     CharacterSet/UTF_8)))
+
+(defmethod render-results MediaType/APPLICATION_ATOM_XML [this variant data]
+  (let [ref (.. this getRequest getOriginalRef)
+        atom-ref (r/format-ref ref "atom")
+        current-page (get-current-page ref)
+        last-page (p/calc-last-page (:total_hits data) p/*page-size*)
+        next-page (when (< current-page last-page) (inc current-page))
+        prev-page (when (> current-page 1) (dec current-page))
+        data (assoc data
+               :order (order-for-display (:sort data))
+               :timestamp (DateUtils/timestamp)
+               :current_page current-page
+               :page_size p/*page-size*
+               :html_results_url (tmpl/h ref)
+               :atom_results_url (tmpl/h atom-ref)
+               :atom_first_page_url (tmpl/h (r/page-ref atom-ref 1))
+               :atom_last_page_url (tmpl/h (r/page-ref atom-ref last-page))
+               :atom_prev_page_url (when prev-page (tmpl/h (r/page-ref atom-ref prev-page)))
+               :atom_next_page_url (when next-page (tmpl/h (r/page-ref atom-ref next-page)))
+               :atom_id (str "urn:uuid:" (java.util.UUID/randomUUID)))]
+    (StringRepresentation.
+     (tmpl/render "search/atom_results" data)
+     MediaType/APPLICATION_ATOM_XML
      Language/ENGLISH_US
      CharacterSet/UTF_8)))
 
@@ -130,7 +171,7 @@
                    (print "</pre>"))
                  (.getMessage (stacktrace/root-cause (:exception data))))))
 
-(defn render-exception MediaType/TEXT_HTML [this variant data]
+(defn render-exception [this variant data]
   (StringRepresentation.
    (html-exception data)
    MediaType/TEXT_HTML
@@ -144,13 +185,11 @@
      (into-array ["doctype" "docid" "name" "citations"
                   "date" "court" "size"]))
 
-
-
 (defn apply-page-options [this solr-query]
   (let [params (get-query-params this)
         page (if-let [p (.get params "page")]
                (Integer/parseInt p) 1)]
-    (.setStart solr-query (* *page-size* (dec page)))))
+    (.setStart solr-query (* p/*page-size* (dec page)))))
 
 (defn execute-search [this solr-query]
   (let [solr (.. this getContext getAttributes (get "org.altlaw.solr.server"))]
