@@ -3,5 +3,5 @@ $default_layout(
     html_title={Search Results - AltLaw},
     content_head=search/html_results_head(),
     content_body=search/html_results_body(),
-    sidebar={}
+    sidebar=search/html_sidebar()
 )$
