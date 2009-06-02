@@ -22,10 +22,11 @@
       "Converts a String date from YYYY-MM-DD format to 
       'January 1, 2009' format."
       [string]
-      (str (.format *long-date-format*
-                    (parse-iso-date string)
-                    (StringBuffer.)
-                    (FieldPosition. 0))))
+      (when (seq string)
+        (str (.format *long-date-format*
+                      (parse-iso-date string)
+                      (StringBuffer.)
+                      (FieldPosition. 0)))))
   (is (= "January 1, 2009" (format-long-date "2009-01-01")))
   (is (= nil (format-long-date ""))))
 
