@@ -115,30 +115,32 @@
      Language/ENGLISH_US
      CharacterSet/UTF_8)))
 
-(defmethod render-results MediaType/APPLICATION_ATOM_XML [this variant data]
+(defn prepare-atom-fields [this data]
   (let [ref (.. this getRequest getOriginalRef)
         atom-ref (r/format-ref ref "atom")
         current-page (get-current-page ref)
         last-page (p/calc-last-page (:total_hits data) p/*page-size*)
         next-page (when (< current-page last-page) (inc current-page))
-        prev-page (when (> current-page 1) (dec current-page))
-        data (assoc data
-               :order (order-for-display (:sort data))
-               :timestamp (DateUtils/timestamp)
-               :current_page current-page
-               :page_size p/*page-size*
-               :html_results_url (tmpl/h ref)
-               :atom_results_url (tmpl/h atom-ref)
-               :atom_first_page_url (tmpl/h (r/page-ref atom-ref 1))
-               :atom_last_page_url (tmpl/h (r/page-ref atom-ref last-page))
-               :atom_prev_page_url (when prev-page (tmpl/h (r/page-ref atom-ref prev-page)))
-               :atom_next_page_url (when next-page (tmpl/h (r/page-ref atom-ref next-page)))
-               :atom_id (str "urn:uuid:" (java.util.UUID/randomUUID)))]
-    (StringRepresentation.
-     (tmpl/render "search/atom_results" data)
-     MediaType/APPLICATION_ATOM_XML
-     Language/ENGLISH_US
-     CharacterSet/UTF_8)))
+        prev-page (when (> current-page 1) (dec current-page))]
+    (assoc data
+      :order (order-for-display (:sort data))
+      :timestamp (DateUtils/timestamp)
+      :current_page current-page
+      :page_size p/*page-size*
+      :html_results_url (tmpl/h ref)
+      :atom_results_url (tmpl/h atom-ref)
+      :atom_first_page_url (tmpl/h (r/page-ref atom-ref 1))
+      :atom_last_page_url (tmpl/h (r/page-ref atom-ref last-page))
+      :atom_prev_page_url (when prev-page (tmpl/h (r/page-ref atom-ref prev-page)))
+      :atom_next_page_url (when next-page (tmpl/h (r/page-ref atom-ref next-page)))
+      :atom_id (str "urn:uuid:" (java.util.UUID/randomUUID)))))
+
+(defmethod render-results MediaType/APPLICATION_ATOM_XML [this variant data]
+  (StringRepresentation.
+   (tmpl/render "search/atom_results" (prepare-atom-fields this data))
+   MediaType/APPLICATION_ATOM_XML
+   Language/ENGLISH_US
+   CharacterSet/UTF_8))
 
 
 ;;; RENDERING EMPTY RESULT SET
@@ -149,6 +151,14 @@
 (defmethod render-no-results MediaType/TEXT_HTML [this variant prepared]
   (StringRepresentation.
    (tmpl/render "search/html_no_results" prepared)
+   MediaType/TEXT_HTML
+   Language/ENGLISH_US
+   CharacterSet/UTF_8))
+
+(defmethod render-no-results MediaType/APPLICATION_ATOM_XML [this variant prepared]
+  (StringRepresentation.
+   (tmpl/render "search/atom_results"
+                (prepare-atom-fields this prepared))
    MediaType/TEXT_HTML
    Language/ENGLISH_US
    CharacterSet/UTF_8))
