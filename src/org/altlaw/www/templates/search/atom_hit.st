@@ -2,7 +2,7 @@
   <title>$it.name$</title>
   <link href="$it.url$"/>
   <id>$it.url$</id>
-  <updated>$it.atom_date$</updated>
+  <updated>$it.timestamp$</updated>
   <summary type="html">
 &lt;div>Court: &lt;span class="court">$it.court$&lt;/span>&lt;/div>
 &lt;div>Date: &lt;span class="date">$it.date$&lt;/span>&lt;/div>
