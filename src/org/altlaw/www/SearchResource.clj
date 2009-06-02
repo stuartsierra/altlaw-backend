@@ -32,30 +32,35 @@
   (when-let [h (get highlights (str docid))]
     (get h "text")))
 
-(defn prepare-hit [highlights doc]
+(defn prepare-hit [this highlights doc]
   (let [docid (.getFieldValue doc "docid")
         name (.getFieldValue doc "name")
         the-name (if (or (nil? name) (empty? name))
                    (str "Untitled #" (.getFieldValue doc "docid"))
-                   name)]
+                   name)
+        date (.getFieldValue doc "date")]
   {:docid docid
-   :url (format "/v1/cases/%s" docid)
+   :url (str (.getTargetRef (Reference. (.. this getRequest getOriginalRef)
+                                        (str "/v1/cases/" docid))))
+   :timestamp (if (seq date) (str date "T10:00:00-05:00")
+                  (DateUtils/timestamp))
    :size (when-let [size (.getFieldValue doc "size")]
            (int (Math/ceil (/ size 1024.0))))
-   :date (date/format-long-date (.getFieldValue doc "date"))
+   :date (date/format-long-date date)
    :court (courts/*court-names* (.getFieldValue doc "court"))
    :name (tmpl/h the-name)
    :citations (map tmpl/h (.getFieldValues doc "citations"))
    :snippets (get-snippets highlights docid)}))
 
-(defn prepare-solr-results [solr-response]
-  (let [docs (.getResults solr-response)]
-    {:query (.. solr-response getHeader (get "params") (get "q"))
+(defn prepare-solr-results [this solr-response]
+  (let [docs (.getResults solr-response)
+        query (.. solr-response getHeader (get "params") (get "q"))]
+    {:query (tmpl/h query)
      :sort (.. solr-response getHeader (get "params") (get "sort"))
      :total_hits (.getNumFound docs)
      :start_hit (if (zero? (.getNumFound docs)) 0 (inc (.getStart docs)))
      :end_hit (+ (.getStart docs) (count docs))
-     :hits (map (partial prepare-hit (.getHighlighting solr-response))
+     :hits (map (partial prepare-hit this (.getHighlighting solr-response))
                 docs)}))
 
 (defn get-current-page [ref]
@@ -423,7 +428,7 @@
    (if-let [search-type (get-search-type this)]
      (if-let [solr-query (get-solr-query this search-type)]
        (let [solr-results (execute-search this solr-query)
-             prepared (prepare-solr-results solr-results)]
+             prepared (prepare-solr-results this solr-results)]
          (if (and (= :citation search-type)
                   (= 1 (:total_hits prepared)))
            ;; Citation search, go straight to document:
