@@ -16,3 +16,8 @@
 <p><input type="submit" value="Rebuild Content Pages"/></p>
 </form>
 
+<form action="/admin/solr-commit" method="post">
+<input type="hidden" name="command" value="command"/>
+<p><input type="submit" value="Solr Commit"/></p>
+</form>
+
