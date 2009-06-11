@@ -40,7 +40,8 @@
 (def reducer-reduce (partial h/standard-reduce my-reduce))
 
 (defn reducer-close [this]
-  (ids/save-docids "altcrawl"))
+  (ids/save-docids "altcrawl")
+  (ids/save-next-docid))
 
 
 (defn tool-run [this args]
