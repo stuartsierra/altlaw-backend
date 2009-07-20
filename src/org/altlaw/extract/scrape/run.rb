@@ -3,6 +3,7 @@
 require 'rubygems'
 require 'hpricot'
 require 'date'
+require 'pp'
 
 require 'org/altlaw/extract/scrape/document'
 require 'org/altlaw/extract/scrape/download'
@@ -19,23 +20,13 @@ class Run
     classname = args.shift
     command = args.shift
 
-    scraper = nil
-    class_file_name = underscore(classname) + '.rb'
-    class_file_path = "src/org/altlaw/extract/scrape/#{class_file_name}"
-    if File.exists?(class_file_path)
-      load("src/org/altlaw/extract/scrape/#{class_file_name}")
-      scraper = Kernel.const_get(classname).new
-    else
-      puts "ERROR: the file #{class_file_name} does not exist"
-      puts "in the directory src/org/altlaw/extract/scrape/"
-      exit(1)
-    end
-
     case command
     when "fetch"
-      fetch(scraper)
+      fetch(load_scraper(classname))
     when "scrape"
-      scrape(scraper)
+      scrape(load_scraper(classname))
+    when "loop"
+      run_loop(classname)
     else
       puts "Invalid command: #{command}"
       puts "Run without arguments for usage instructions."
@@ -46,9 +37,48 @@ class Run
 
   private
 
+  def load_scraper(classname)
+    class_file_name = underscore(classname) + '.rb'
+    class_file_path = "src/org/altlaw/extract/scrape/#{class_file_name}"
+    if File.exists?(class_file_path)
+      load("src/org/altlaw/extract/scrape/#{class_file_name}")
+      return Kernel.const_get(classname).new
+    else
+      puts "ERROR: the file #{class_file_name} does not exist"
+      puts "in the directory src/org/altlaw/extract/scrape/"
+      exit(1)
+    end
+  end
+
+  def run_loop(classname)
+    while true
+      scraper = load_scraper(classname)
+      puts ">>> Starting with #{classname}"
+      begin
+        fetch(scraper)
+        scrape(scraper)
+      rescue Exception => e
+        puts ">>> ERROR"
+        puts e.inspect
+        puts e.stacktrace[0..5]
+      end
+
+      puts ">>> Done with #{classname}"
+      puts ">>> Modify your scraper code as needed."
+      puts ">>> Press ENTER to run again; Ctrl-C to quit."
+      readline
+    end
+  end
+
   def fetch(scraper)
     require 'net/http'
     require 'uri'
+
+    classname = scraper.class.name
+    puts "Removing old files for #{classname}."
+    FileUtils.rm("#{classname}-*.html")
+    FileUtils.rm("#{classname}-*.meta")
+    FileUtils.rm("#{classname}-*.out")
 
     requests = scraper.request()
 
@@ -99,26 +129,39 @@ class Run
     classname = scraper.class.name
     html_files = Dir.glob("#{classname}-*.html")
 
+    i = 0
     html_files.each do |html_file|
       puts "Running scraper #{classname} on file #{html_file}"
 
       meta_file = html_file.sub('.html', '.meta')
       html = File.read(html_file)
       meta = eval(File.read(meta_file))
-      run_scraper(scraper, html, meta)
+      documents = run_scraper(scraper, html, meta)
+
+      write_documents(classname, documents, i)
+      i += 1
     end
   end
 
   def run_scraper(scraper, html, meta)
+    classname = scraper.class.name
     download = Download.from_map(meta)
     download.response_body_bytes = html.to_java_bytes
     documents = []
     scraper.parse(download, documents)
-    documents.each do |doc|
-      hash = doc.to_hash
-      hash[:date] = hash[:date].to_s
-      pp hash
-      puts ""
+    documents
+  end
+
+  def write_documents(classname, documents, i)
+    filename = "#{classname}-#{i}.out";
+    puts "Saving scraper output to #{filename}"
+    File.open(filename, 'w') do |io|
+      documents.each do |doc|
+        hash = doc.to_hash
+        hash[:date] = hash[:date].to_s
+        PP.pp(hash, io)
+        io.puts ""
+      end
     end
   end
 
@@ -135,6 +178,9 @@ And command is either "fetch" or "scrape"
 "fetch" will download the HTML file and save it.
 
 "scrape" will attempt to scrape the downloaded files.
+
+"loop" will run fetch, then scrape, then pause while you
+make any needed changes, then repeat.
 EOF
     Kernel.exit(1)
   end
