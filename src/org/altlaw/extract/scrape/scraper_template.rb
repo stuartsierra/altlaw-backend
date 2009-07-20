@@ -22,8 +22,8 @@ class ScraperTemplate
     #
     # For a WWW form POST request, do
     #
-    #     DownloadRequest.new(url, {"field" => "value",
-    #                               "field" => "value"})
+    #     DownloadRequest.new(url, {"field1" => "value1",
+    #                               "field2" => "value2"})
     #
     # Return the DownloadRequest objects in an Array
   end
