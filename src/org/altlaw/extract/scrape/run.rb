@@ -4,6 +4,7 @@ require 'rubygems'
 require 'hpricot'
 require 'date'
 require 'pp'
+require 'fileutils'
 
 require 'org/altlaw/extract/scrape/document'
 require 'org/altlaw/extract/scrape/download'
@@ -76,9 +77,9 @@ class Run
 
     classname = scraper.class.name
     puts "Removing old files for #{classname}."
-    FileUtils.rm("#{classname}-*.html")
-    FileUtils.rm("#{classname}-*.meta")
-    FileUtils.rm("#{classname}-*.out")
+    FileUtils.rm_f("#{classname}-*.html")
+    FileUtils.rm_f("#{classname}-*.meta")
+    FileUtils.rm_f("#{classname}-*.out")
 
     requests = scraper.request()
 
