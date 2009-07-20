@@ -10,8 +10,6 @@ require 'org/altlaw/extract/scrape/download_request'
 require 'org/altlaw/extract/scrape/expect'
 
 class Run
-  include_class 'clojure.lang.RT'
-
   def run(args)
     puts "AltLaw.org web scraper tester."
     if args.length.zero?
