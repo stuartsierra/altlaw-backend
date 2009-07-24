@@ -72,7 +72,8 @@ class Run
   end
 
   def fetch(scraper)
-    require 'net/http'
+    require 'jruby-openssl'
+    require 'net/https'
     require 'uri'
 
     classname = scraper.class.name
@@ -96,12 +97,18 @@ class Run
   end
 
   def http_download(request)
-    uri = request.request_uri
+    uri = URI.parse(request.request_uri)
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true if uri.scheme == 'https'
     form = request.request_form_fields
     if form.nil?
-      Net::HTTP.get_response(URI.parse(uri))
+      http.start { http.request_get(uri.path) }
     else
-      Net::HTTP.post_form(URI.parse(uri), form)
+      req = Net::HTTP::Post.new(uri.path)
+      req.form_data = form
+      http.start do |h|
+        h.request(req)
+      end
     end
   end
 
