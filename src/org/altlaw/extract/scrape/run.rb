@@ -72,7 +72,6 @@ class Run
   end
 
   def fetch(scraper)
-    require 'jruby-openssl'
     require 'net/https'
     require 'uri'
 
