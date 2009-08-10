@@ -68,7 +68,7 @@
 (defn -represent [this variant]
   (try
    (binding [*solr* (.. this getContext getAttributes (get "org.altlaw.solr.server"))]
-     (let [docid (.. this getRequest getAttributes (get "docid"))]
+     (let [docid (Integer/parseInt (.. this getRequest getAttributes (get "docid")))]
        (represent docid (.getMediaType variant))))
    (catch Exception e
      (if (and (instance? org.jets3t.service.S3ServiceException
