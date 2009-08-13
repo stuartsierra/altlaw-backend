@@ -100,10 +100,13 @@ class Run
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true if uri.scheme == 'https'
     form = request.request_form_fields
+
+    request_path = uri.path + (uri.query ? "?#{uri.query}" : "")
+
     if form.nil?
-      http.start { http.request_get(uri.path) }
+      http.start { http.request_get(request_path) }
     else
-      req = Net::HTTP::Post.new(uri.path)
+      req = Net::HTTP::Post.new(request_path)
       req.form_data = form
       http.start do |h|
         h.request(req)
